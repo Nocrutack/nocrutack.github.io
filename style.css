@@ -1,34 +1,53 @@
 body {
     background-color: #0d0d0d;
-    color: #00ff41; /* Verde matriz clásica */
+    color: #00ff41; 
     font-family: 'Courier New', Courier, monospace;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
+    overflow: hidden; /* Evita que el fondo se mueva */
 }
 
 .terminal {
     background: #000;
     width: 80%;
-    max-width: 700px;
+    max-width: 750px;
+    height: 450px; /* Altura fija para que el scroll funcione bien */
     border: 1px solid #333;
     box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    display: flex;
+    flex-direction: column;
 }
 
 .header {
     background: #333;
     color: #ddd;
-    padding: 5px 10px;
-    font-size: 12px;
+    padding: 8px 15px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
 }
 
 .content {
     padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-y: auto; /* Permite scroll interno */
+    flex-grow: 1; /* Ocupa todo el espacio disponible */
 }
 
-.prompt { color: #ff003c; } /* Color para el símbolo $ */
+/* Estilo para la barra de scroll (para que no se vea fea y blanca) */
+.content::-webkit-scrollbar {
+    width: 6px;
+}
+.content::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 10px;
+}
+
+.prompt { color: #0087ff; font-weight: bold; }
 
 .blink {
     animation: blinker 1s linear infinite;
@@ -41,26 +60,20 @@ body {
 #input-line {
     display: flex;
     align-items: center;
+    margin-top: 5px;
 }
 
 #user-input {
     background: transparent;
     border: none;
-    color: transparent; /* El texto real es invisible */
+    color: transparent;
     outline: none;
-    width: 1px; /* Casi invisible */
+    width: 1px;
     position: absolute;
 }
 
 #display-text {
-    color: #00ff41; /* Este es el texto que SÍ se verá */
+    color: #00ff41;
     margin-left: 5px;
-    white-space: pre;
-}
-.content {
-    padding: 15px;
-    font-size: 16px;
-    line-height: 1.6;
-    overflow-y: auto; /* Permite scroll si hay mucho texto */
-    max-height: 300px; /* Ajusta según el tamaño de tu terminal */
+    white-space: pre-wrap; /* Para que el texto largo salte de línea */
 }
