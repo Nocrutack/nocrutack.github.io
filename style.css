@@ -1,19 +1,19 @@
-/* --- ESTILOS GENERALES --- */
-body {
-    background-color: #0d0d0d;
-    color: #00ff41; /* Verde matriz */
-    font-family: 'Courier New', Courier, monospace;
+/* --- RESET Y FONDO FORZADO --- */
+html, body {
+    background-color: #0d0d0d !important;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    margin: 0;
     overflow-x: hidden;
 }
 
+/* --- TERMINAL --- */
 .terminal {
-    background: #000;
+    background: #000 !important;
     width: 90%;
     max-width: 750px;
     height: 450px;
@@ -37,42 +37,30 @@ body {
     padding: 20px;
     font-size: 16px;
     line-height: 1.6;
+    color: #00ff41; /* Verde matriz */
     overflow-y: auto;
     flex-grow: 1;
 }
 
-/* Scrollbar personalizada */
-.content::-webkit-scrollbar {
-    width: 6px;
-}
-.content::-webkit-scrollbar-thumb {
-    background: #222;
-    border-radius: 10px;
-}
-
+/* --- INPUTS Y TEXTO (CORRECCIÓN MÓVIL) --- */
 .prompt { color: #0087ff; font-weight: bold; }
-
-.blink {
-    animation: blinker 1s linear infinite;
-}
-
-@keyframes blinker {
-    50% { opacity: 0; }
-}
 
 #input-line {
     display: flex;
     align-items: center;
-    margin-top: 5px;
+    flex-wrap: wrap; /* Para que en móviles no se corte */
 }
 
 #user-input {
-    background: transparent;
-    border: none;
-    color: transparent;
-    outline: none;
+    background: transparent !important;
+    border: none !important;
+    color: transparent !important;
+    outline: none !important;
     width: 1px;
     position: absolute;
+    /* Quita el cuadro blanco en Android/iOS */
+    appearance: none;
+    -webkit-appearance: none;
 }
 
 #display-text {
@@ -82,7 +70,10 @@ body {
     word-break: break-all;
 }
 
-/* --- ESTILOS DEL MONITOR (GUI) --- */
+.blink { animation: blinker 1s linear infinite; color: #00ff41; }
+@keyframes blinker { 50% { opacity: 0; } }
+
+/* --- MONITOR (GUI) --- */
 #monitor {
     position: fixed;
     top: 0; left: 0;
@@ -116,65 +107,29 @@ body {
     color: #333;
 }
 
-.monitor-nav {
-    background: #0087ff;
-    color: white;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#monitor-body {
-    padding: 20px;
-    overflow-y: auto;
-    font-family: sans-serif;
-    flex-grow: 1;
-}
-
-#back-btn {
-    background: #ff5f56;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-}
-
-.monitor-base {
-    width: 150px;
-    height: 30px;
-    background: #333;
-    margin: 5px auto;
-    border-radius: 0 0 15px 15px;
-}
-
 /* --- DISEÑO RESPONSIVO (MÓVIL) --- */
 @media screen and (max-width: 600px) {
+    body {
+        background-color: #0d0d0d !important;
+        align-items: flex-start; /* Para que la terminal empiece arriba */
+        padding-top: 20px;
+    }
+
     .terminal {
         width: 95% !important;
-        height: 70vh !important;
-        margin: 10px;
+        height: 80vh !important; /* Más alto para que quepa el texto */
     }
 
     .content {
         font-size: 14px !important;
-        padding: 10px !important;
+        padding: 15px !important;
     }
 
     .monitor-frame {
         width: 100% !important;
         height: 100% !important;
         border-radius: 0 !important;
-        padding: 5px !important;
     }
 
-    .monitor-base {
-        display: none !important;
-    }
-
-    #display-text {
-        font-size: 14px !important;
-    }
+    .monitor-base { display: none !important; }
 }
