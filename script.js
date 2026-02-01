@@ -78,6 +78,37 @@ inputField.addEventListener('keydown', (e) => {
             contentDiv.scrollTop = contentDiv.scrollHeight;
         }, 10);
     }
+    // ... dentro del evento keydown de Enter ...
+
+else if (cmd === 'cd') {
+    if (temas[arg]) {
+        abrirMonitor(arg);
+    } else {
+        consoleContent.innerHTML += `Error: La carpeta '${arg}' no existe.`;
+    }
+}
+
+// Funciones nuevas fuera del event listener:
+
+function abrirMonitor(tema) {
+    const monitor = document.getElementById('monitor');
+    const monitorContent = document.getElementById('monitor-content');
+    
+    // Aquí puedes poner HTML más complejo para cada tema
+    const infoTemas = {
+        "redes": "<h1>📁 Laboratorio de Redes</h1><p>Contenido detallado sobre Redes...</p><img src='https://via.placeholder.com/400x200' alt='Topologia'>",
+        "linux": "<h1>📁 Sistema Linux</h1><p>Aquí verás tus comandos de Bash favoritos.</p>",
+        "seguridad": "<h1>📁 Seguridad Informatica</h1><p>OWASP Top 10 y herramientas de escaneo.</p>"
+    };
+
+    monitorContent.innerHTML = infoTemas[tema];
+    monitor.style.display = "flex"; // Mostramos el monitor
+}
+
+function closeMonitor() {
+    document.getElementById('monitor').style.display = "none";
+    inputField.focus(); // Regresa el foco a la terminal
+}
 });
 
 // Iniciar terminal
