@@ -96,3 +96,14 @@ function closeMonitor() {
 }
 
 window.onload = typeWriter;
+// Ajuste para evitar que el teclado móvil tape el input
+window.addEventListener('resize', () => {
+    if (document.activeElement.tagName === 'INPUT') {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+});
+
+// Forzar el foco al input si tocas cualquier parte de la terminal
+document.querySelector('.terminal').addEventListener('click', () => {
+    inputField.focus();
+});
