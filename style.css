@@ -37,3 +37,23 @@ body {
 @keyframes blinker {
     50% { opacity: 0; }
 }
+
+#input-line {
+    display: flex;
+    align-items: center;
+}
+
+#user-input {
+    background: transparent;
+    border: none;
+    color: transparent; /* El texto real es invisible */
+    outline: none;
+    width: 1px; /* Casi invisible */
+    position: absolute;
+}
+
+#display-text {
+    color: #00ff41; /* Este es el texto que SÍ se verá */
+    margin-left: 5px;
+    white-space: pre;
+}
