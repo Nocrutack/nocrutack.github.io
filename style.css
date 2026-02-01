@@ -1,0 +1,39 @@
+body {
+    background-color: #0d0d0d;
+    color: #00ff41; /* Verde matriz clásica */
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.terminal {
+    background: #000;
+    width: 80%;
+    max-width: 700px;
+    border: 1px solid #333;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+}
+
+.header {
+    background: #333;
+    color: #ddd;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.content {
+    padding: 20px;
+}
+
+.prompt { color: #ff003c; } /* Color para el símbolo $ */
+
+.blink {
+    animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+    50% { opacity: 0; }
+}
