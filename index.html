@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nocrutack | Cybersecurity Lab</title>
+    <title>Nocrutack | Cybersecurity Lab</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="terminal">
-        <div class="header">root@nocrutack: ~</div>
-        <div class="content">
-            <p><span class="prompt">$</span> whoami</p>
-            <p>Aspirante a Analista de Ciberseguridad. Autodidacta en formación.</p>
-            
-            <p><span class="prompt">$</span> ls skills/</p>
-            <ul>
-                <li>Cisco_Networking.pdf</li>
-                <li>Linux_Basics.sh</li>
-                <li>Network_Analysis.pcap</li>
-            </ul>
 
-            <p><span class="prompt">$</span> <span class="blink">_</span></p>
+    <div class="terminal">
+        <div class="header">
+            <span class="buttons">● ● ●</span>
+            <span class="title">nocrutack@github: ~</span>
+        </div>
+
+        <div class="content">
+            <p id="typing-text"></p>
+            
+            <p id="final-prompt" style="display: none;">
+                <span class="prompt">nocrutack@lab:~$</span> <span class="blink">_</span>
+            </p>
         </div>
     </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
