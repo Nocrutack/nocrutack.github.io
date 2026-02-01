@@ -57,3 +57,10 @@ body {
     margin-left: 5px;
     white-space: pre;
 }
+.content {
+    padding: 15px;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-y: auto; /* Permite scroll si hay mucho texto */
+    max-height: 300px; /* Ajusta según el tamaño de tu terminal */
+}
