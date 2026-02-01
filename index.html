@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nocrutack | Cybersecurity Lab</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1.2">
 </head>
 <body>
 
@@ -20,7 +20,7 @@
             <div id="input-line" style="display: none;">
                 <span class="prompt">nocrutack@lab:~$</span>
                 <span id="display-text"></span><span class="blink">_</span>
-                <input type="text" id="user-input" autofocus autocomplete="off">
+                <input type="text" id="user-input" autofocus autocomplete="off" autocapitalize="none" spellcheck="false">
             </div>
         </div>
     </div>
@@ -30,7 +30,7 @@
             <div class="monitor-screen">
                 <nav class="monitor-nav">
                     <span id="monitor-title">Explorador de Archivos</span>
-                    <button id="back-btn" onclick="closeMonitor()">✖ VOLVER A TERMINAL</button>
+                    <button id="back-btn" onclick="closeMonitor()">✖ VOLVER</button>
                 </nav>
                 <div id="monitor-body">
                     </div>
@@ -39,6 +39,6 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=1.2"></script>
 </body>
 </html>
