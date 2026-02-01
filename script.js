@@ -96,39 +96,3 @@ function closeMonitor() {
 }
 
 window.onload = typeWriter;
-
-/* ... aquí termina todo tu código anterior ... */
-
-#display-text {
-    color: #00ff41;
-    margin-left: 5px;
-    white-space: pre-wrap;
-}
-
-/* --- ESTO ES LO QUE PEGAS AL FINAL --- */
-
-@media (max-width: 600px) {
-    .terminal {
-        width: 95%; 
-        height: 70vh; /* Bajamos un poco la altura para que el teclado no la tape */
-        margin-top: 20px;
-    }
-
-    .header {
-        font-size: 10px; /* Encabezado más pequeño */
-    }
-
-    .content {
-        font-size: 14px; 
-        padding: 10px;
-    }
-
-    .monitor-frame {
-        width: 98%;
-        height: 95%;
-    }
-
-    #monitor-body h1 {
-        font-size: 1.2rem; /* Títulos más acorde al móvil */
-    }
-}
