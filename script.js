@@ -2,11 +2,11 @@ const terminalText = ">> NOCRUTACK OS v1.0.4\n>> Cargando módulos de aprendizaj
 const speed = 40;
 let i = 0;
 
-// Base de datos de temas
+// Base de datos de temas (Info rápida para la terminal)
 const temas = {
-    "redes": "Nivel: Intermedio. Dominando protocolos TCP/IP, DNS y configuración de Routers Cisco.",
-    "linux": "Nivel: Avanzado. Manejo de Bash, permisos de usuario y administración de servidores Debian.",
-    "seguridad": "Nivel: Iniciando. Aprendiendo escaneo de vulnerabilidades y OWASP Top 10."
+    "redes": "Abriendo interfaz gráfica de Redes...",
+    "linux": "Abriendo interfaz gráfica de Linux...",
+    "seguridad": "Abriendo interfaz gráfica de Seguridad..."
 };
 
 const inputField = document.getElementById('user-input');
@@ -14,7 +14,6 @@ const displayText = document.getElementById('display-text');
 const consoleContent = document.getElementById('typing-text');
 const contentDiv = document.querySelector('.content');
 
-// Función de escritura inicial
 function typeWriter() {
     if (i < terminalText.length) {
         let char = terminalText.charAt(i);
@@ -27,12 +26,10 @@ function typeWriter() {
     }
 }
 
-// Escuchar el teclado para mostrar lo que escribes
 inputField.addEventListener('input', (e) => {
     displayText.textContent = e.target.value;
 });
 
-// Lógica de comandos al presionar Enter
 inputField.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const fullCommand = inputField.value.toLowerCase().trim();
@@ -40,10 +37,8 @@ inputField.addEventListener('keydown', (e) => {
         const cmd = parts[0];
         const arg = parts[1];
         
-        // 1. Mostrar el comando ingresado en la pantalla
         consoleContent.innerHTML += `<br><span class="prompt">nocrutack@lab:~$</span> ${fullCommand}<br>`;
 
-        // 2. Procesar comandos
         if (cmd === 'ls') {
             const lista = Object.keys(temas)
                 .map(t => `<span style="color: #5cb3ff; font-weight: bold;">${t}</span>`)
@@ -55,6 +50,8 @@ inputField.addEventListener('keydown', (e) => {
                 consoleContent.innerHTML += "Uso: cd [nombre_del_tema]";
             } else if (temas[arg]) {
                 consoleContent.innerHTML += temas[arg];
+                // LLAMADA A LA FUNCIÓN DEL MONITOR
+                setTimeout(() => { abrirMonitor(arg); }, 500);
             } else {
                 consoleContent.innerHTML += `Error: La carpeta '${arg}' no existe.`;
             }
@@ -63,53 +60,39 @@ inputField.addEventListener('keydown', (e) => {
             consoleContent.innerHTML = "Terminal limpia. Sistema listo.<br>";
         }
         else if (cmd === 'help') {
-            consoleContent.innerHTML += "Comandos disponibles: <br> - ls: Listar temas <br> - cd [tema]: Leer contenido <br> - clear: Limpiar pantalla";
+            consoleContent.innerHTML += "Comandos: ls, cd [tema], clear, help";
         }
         else if (fullCommand !== "") {
             consoleContent.innerHTML += `Comando no reconocido: ${cmd}`;
         }
 
-        // 3. Limpiar entrada y forzar scroll hacia abajo
         inputField.value = "";
         displayText.textContent = "";
         
-        // Pequeño retraso para asegurar que el DOM se actualice antes del scroll
         setTimeout(() => {
             contentDiv.scrollTop = contentDiv.scrollHeight;
         }, 10);
     }
-    // ... dentro del evento keydown de Enter ...
+});
 
-else if (cmd === 'cd') {
-    if (temas[arg]) {
-        abrirMonitor(arg);
-    } else {
-        consoleContent.innerHTML += `Error: La carpeta '${arg}' no existe.`;
-    }
-}
-
-// Funciones nuevas fuera del event listener:
-
+// FUNCIONES DEL MONITOR (Fuera del event listener)
 function abrirMonitor(tema) {
     const monitor = document.getElementById('monitor');
-    const monitorContent = document.getElementById('monitor-content');
+    const monitorBody = document.getElementById('monitor-body'); // Asegúrate de que este ID coincida con tu HTML
     
-    // Aquí puedes poner HTML más complejo para cada tema
     const infoTemas = {
-        "redes": "<h1>📁 Laboratorio de Redes</h1><p>Contenido detallado sobre Redes...</p><img src='https://via.placeholder.com/400x200' alt='Topologia'>",
-        "linux": "<h1>📁 Sistema Linux</h1><p>Aquí verás tus comandos de Bash favoritos.</p>",
-        "seguridad": "<h1>📁 Seguridad Informatica</h1><p>OWASP Top 10 y herramientas de escaneo.</p>"
+        "redes": "<h1>📁 Laboratorio de Redes</h1><p>Dominando protocolos TCP/IP y configuración Cisco.</p><img src='https://via.placeholder.com/400x200' style='width:100%; border-radius:10px;'>",
+        "linux": "<h1>📁 Sistema Linux</h1><p>Administración de servidores y scripting en Bash.</p>",
+        "seguridad": "<h1>📁 Seguridad Informática</h1><p>Análisis de vulnerabilidades y defensa activa.</p>"
     };
 
-    monitorContent.innerHTML = infoTemas[tema];
-    monitor.style.display = "flex"; // Mostramos el monitor
+    monitorBody.innerHTML = infoTemas[tema];
+    monitor.style.display = "flex";
 }
 
 function closeMonitor() {
     document.getElementById('monitor').style.display = "none";
-    inputField.focus(); // Regresa el foco a la terminal
+    inputField.focus();
 }
-});
 
-// Iniciar terminal
 window.onload = typeWriter;
