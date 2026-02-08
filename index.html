@@ -4,7 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Nocrutack | Cybersecurity Lab</title>
-    <link rel="stylesheet" href="style.css?v=5.0">
+    <style>
+        /* --- PEGADO AQUÍ PARA QUE NO FALLE --- */
+        html, body {
+            background-color: #0d0d0d !important;
+            margin: 0; padding: 0; width: 100%; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'SF Mono', 'Monaco', monospace; overflow: hidden;
+        }
+        .terminal {
+            background: #000; width: 90%; max-width: 800px; height: 480px;
+            border-radius: 12px; border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+        }
+        .header {
+            background: #2d2d2d; height: 38px; display: flex; align-items: center;
+            padding: 0 15px; position: relative;
+        }
+        .buttons { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .title { position: absolute; width: 100%; text-align: center; color: #999; font-size: 13px; pointer-events: none; }
+        .content { padding: 20px; font-size: 15px; color: #00ff41; overflow-y: auto; flex-grow: 1; }
+        .prompt { color: #0087ff; font-weight: bold; margin-right: 8px; }
+        #input-line { display: flex; align-items: center; }
+        #user-input {
+            background: transparent !important; border: none !important;
+            color: transparent !important; outline: none !important;
+            width: 1px; position: absolute; appearance: none;
+        }
+        #display-text { color: #00ff41; white-space: pre-wrap; }
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+        #monitor {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,33 +54,23 @@
             </div>
             <span class="title">nocrutack — bash — 80x24</span>
         </div>
-
         <div class="content">
             <p id="typing-text"></p>
-            
             <div id="input-line" style="display: none;">
                 <span class="prompt">nocrutack@lab:~$</span>
                 <span id="display-text"></span><span class="blink">_</span>
-                <input type="text" id="user-input" autofocus autocomplete="off" 
-                       autocapitalize="none" spellcheck="false" enterkeyhint="done">
+                <input type="text" id="user-input" autofocus autocomplete="off" maxlength="15">
             </div>
         </div>
     </div>
 
-    <div id="monitor" style="display: none;">
-        <div class="monitor-frame">
-            <div class="monitor-screen">
-                <nav class="monitor-nav" style="display: flex; justify-content: space-between; padding: 10px; background: #333; color: white;">
-                    <span id="monitor-title">Explorador de Archivos</span>
-                    <button id="back-btn" onclick="closeMonitor()" style="cursor:pointer; background: #ff5f56; border: none; color: white; border-radius: 5px; padding: 5px 10px;">✖ VOLVER</button>
-                </nav>
-                <div id="monitor-body" style="padding: 20px; overflow-y: auto;">
-                    </div>
-            </div>
-            <div class="monitor-base"></div>
+    <div id="monitor">
+        <div style="background: white; padding: 20px; border-radius: 10px; width: 80%;">
+            <button onclick="document.getElementById('monitor').style.display='none'">CERRAR</button>
+            <div id="monitor-body"></div>
         </div>
     </div>
 
-    <script src="script.js?v=5.0"></script>
+    <script src="script.js"></script>
 </body>
 </html>
