@@ -13,133 +13,133 @@ const temas = {
 };
 
 /* --- SELECTORES DEL DOM --- */
-const inputField = document.getElementById('user-input'); // El input real (invisible)
-const displayText = document.getElementById('display-text'); // El texto que el usuario ve mientras escribe
-const consoleContent = document.getElementById('typing-text'); // El área donde se imprime el historial
-const contentDiv = document.querySelector('.content'); // El contenedor principal para manejar el scroll
-const themeToggle = document.getElementById('theme-toggle'); // El botón de interruptor de luz/oscuridad
+const inputField = document.getElementById('user-input'); // El input real (invisible) que captura el teclado
+const displayText = document.getElementById('display-text'); // El texto que el usuario ve reflejado mientras escribe
+const consoleContent = document.getElementById('typing-text'); // El área donde se imprime todo el historial de la consola
+const contentDiv = document.querySelector('.content'); // El contenedor principal que necesitamos para controlar el scroll
+const themeToggle = document.getElementById('theme-toggle'); // El botón físico para cambiar entre modo luz y oscuridad
 
 /* --- MOTOR DE ESCRITURA (INTRO) --- */
 function typeWriter() {
-    // Si aún quedan letras por escribir en el string terminalText
+    // Si aún quedan caracteres por procesar en el string de bienvenida
     if (i < terminalText.length) {
-        let char = terminalText.charAt(i); // Obtiene el carácter actual
-        // Si el carácter es un salto de línea (\n), añade un <br>, si no, añade la letra
+        let char = terminalText.charAt(i); // Capturamos el carácter en la posición i
+        // Convertimos saltos de línea de código (\n) en saltos de línea visuales (<br>)
         consoleContent.innerHTML += (char === "\n") ? "<br>" : char;
-        i++; // Avanza al siguiente carácter
-        setTimeout(typeWriter, speed); // Llama a la función de nuevo tras el tiempo definido
-        contentDiv.scrollTop = contentDiv.scrollHeight; // Desplaza el scroll al fondo automáticamente
+        i++; // Incrementamos el contador para la siguiente letra
+        setTimeout(typeWriter, speed); // Re-ejecutamos la función tras una pequeña pausa (30ms)
+        contentDiv.scrollTop = contentDiv.scrollHeight; // Forzamos el scroll hacia abajo mientras aparece el texto
     } else {
-        finishLoading(); // Al terminar de escribir, habilita la terminal
+        finishLoading(); // Una vez terminado el texto, activamos la funcionalidad de la terminal
     }
 }
 
-// Función para preparar la interfaz tras la carga inicial
+// Función para finalizar el estado de carga y habilitar la interacción
 function finishLoading() {
-    if (!isTyping) return; // Evita ejecuciones dobles
-    isTyping = false; // Cambia el estado a "ya no está cargando"
-    consoleContent.innerHTML = terminalText.replace(/\n/g, "<br>"); // Asegura que el texto esté completo
-    document.getElementById('input-line').style.display = "flex"; // Muestra la línea de comandos
-    inputField.focus(); // Pone el cursor automáticamente en el campo de texto
+    if (!isTyping) return; // Si ya no estamos en modo "escribiendo", salimos para evitar errores
+    isTyping = false; // Marcamos el estado global como "interactivo"
+    consoleContent.innerHTML = terminalText.replace(/\n/g, "<br>"); // Nos aseguramos de que el texto esté completo en pantalla
+    document.getElementById('input-line').style.display = "flex"; // Hacemos visible la línea del cursor (prompt)
+    inputField.focus(); // Ponemos el foco del teclado automáticamente en el input invisible
 }
 
 /* --- LÓGICA DE PERSISTENCIA Y CAMBIO DE TEMA --- */
 
-// Función central para cambiar el aspecto visual
+// Función encargada de aplicar las clases visuales de CSS
 function applyTheme(theme) {
     if (theme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light'); // Activa el modo claro en el CSS
-        if (themeToggle) themeToggle.innerText = 'MODO OSCURO'; // Cambia la etiqueta del botón
+        document.documentElement.setAttribute('data-theme', 'light'); // Aplicamos el atributo que lee el CSS
+        if (themeToggle) themeToggle.innerText = 'MODO OSCURO'; // Cambiamos el texto del botón al opuesto
     } else {
-        document.documentElement.removeAttribute('data-theme'); // Elimina el atributo para volver a oscuro
-        if (themeToggle) themeToggle.innerText = 'MODO CLARO'; // Cambia la etiqueta del botón
+        document.documentElement.removeAttribute('data-theme'); // Quitamos el atributo para volver al default (oscuro)
+        if (themeToggle) themeToggle.innerText = 'MODO CLARO'; // Actualizamos el texto del botón
     }
 }
 
-// Al cargar el archivo, busca si el usuario ya tenía un tema preferido guardado
+// Al arrancar, verificamos si el navegador recuerda una preferencia anterior del usuario
 const savedTheme = localStorage.getItem('theme');
-if (savedTheme) applyTheme(savedTheme); // Si existe, lo aplica de inmediato
+if (savedTheme) applyTheme(savedTheme); // Si existe un tema guardado, lo aplicamos inmediatamente
 
-// Escuchador de clics para el botón de cambio de tema
+// Listener para detectar el clic en el botón de cambio de tema
 if (themeToggle) {
     themeToggle.addEventListener('click', (e) => {
-        e.stopPropagation(); // Evita que el clic se propague a otros elementos
-        // Comprueba si el tema actual es claro
+        e.stopPropagation(); // Evitamos que el clic afecte a otros elementos del DOM
+        // Verificamos si el modo actual es claro consultando el atributo del HTML
         const isCurrentlyLight = document.documentElement.getAttribute('data-theme') === 'light';
-        const nextTheme = isCurrentlyLight ? 'dark' : 'light'; // Define el siguiente estado
+        const nextTheme = isCurrentlyLight ? 'dark' : 'light'; // Elegimos el tema contrario
         
-        applyTheme(nextTheme); // Aplica el nuevo tema visualmente
-        localStorage.setItem('theme', nextTheme); // Guarda la elección en la memoria del navegador
-        inputField.focus(); // Devuelve el foco a la terminal para seguir escribiendo
+        applyTheme(nextTheme); // Aplicamos el cambio visual
+        localStorage.setItem('theme', nextTheme); // Guardamos la preferencia en el LocalStorage
+        inputField.focus(); // Re-enfocamos el input para no perder la capacidad de escribir
     });
 }
 
 /* --- EVENTOS DE TECLADO --- */
 
-// Permite saltarse la intro presionando la tecla Enter
+// Permite al usuario saltarse la animación de intro pulsando la tecla 'Enter'
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && isTyping) finishLoading();
 });
 
-// Actualiza el texto visible en pantalla cada vez que el usuario escribe en el input invisible
+// Sincroniza en tiempo real lo que el usuario escribe con lo que se muestra en el display visual
 inputField.addEventListener('input', (e) => {
     displayText.textContent = e.target.value;
 });
 
-// Manejador principal de comandos cuando se presiona Enter
+// Procesador principal de comandos al pulsar 'Enter'
 inputField.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !isTyping) {
-        const rawInput = inputField.value.trim(); // Obtiene el texto sin espacios extras
-        const parts = rawInput.split(' '); // Divide el comando de los argumentos
-        const cmd = parts[0].toLowerCase(); // La primera palabra es el comando
-        const arg = parts[1] ? parts[1].toLowerCase() : null; // La segunda palabra (si existe) es el argumento
+        const rawInput = inputField.value.trim(); // Limpiamos espacios en blanco al inicio y final
+        const parts = rawInput.split(' '); // Dividimos la entrada por espacios (Comando + Argumento)
+        const cmd = parts[0].toLowerCase(); // El primer elemento es el comando (siempre en minúsculas)
+        const arg = parts[1] ? parts[1].toLowerCase() : null; // El segundo es el argumento (si existe)
 
-        // Imprime el comando que acabas de escribir en el historial de la terminal
+        // Imprimimos la línea que el usuario acaba de escribir en el historial
         consoleContent.innerHTML += `<br><span class="prompt">nocrutack@lab:~$</span> ${rawInput}<br>`;
 
-        /* --- LÓGICA DE COMANDOS --- */
+        /* --- LOGICA DEL INTERPRETE DE COMANDOS --- */
         
         if (cmd === 'ls') {
-            // Muestra los nombres de los temas configurados en el objeto 'temas'
+            // Mapeamos los temas permitidos y los mostramos con un color azul brillante
             const lista = Object.keys(temas)
                 .map(t => `<span style="color: #5cb3ff; font-weight: bold;">${t}</span>`)
-                .join(' &nbsp;&nbsp; ');
+                .join(' &nbsp;&nbsp; '); // Separamos los nombres con espacios HTML
             consoleContent.innerHTML += lista;
         } 
         
         else if (cmd === 'cd') {
-            // Verifica si el argumento existe y está en nuestra lista de temas
+            // Verificamos si el usuario escribió un destino y si ese destino es válido
             if (arg && temas[arg]) {
                 consoleContent.innerHTML += `<span style="color: #27c93f;">Abriendo entorno de ${arg}...</span>`;
                 setTimeout(() => { 
-                    window.location.href = arg + ".html"; // Redirige al archivo .html correspondiente
-                }, 800); 
+                    window.location.href = arg + ".html"; // Redirigimos al archivo correspondiente (ej: linux.html)
+                }, 800); // Pequeña pausa de 800ms para dar sensación de carga
             } else {
-                // Mensaje de error si el directorio no existe
+                // Si el directorio no existe o no se especificó, lanzamos error en rojo
                 consoleContent.innerHTML += `<span style="color: #ff5f56;">Error: Directorio '${arg || ""}' no encontrado.</span>`;
             }
         }
         
         else if (cmd === 'clear') {
-            // Resetea el contenido de la consola
+            // Vaciamos el contenido del div para limpiar la pantalla
             consoleContent.innerHTML = "Terminal limpia.<br>";
         }
         
         else if (cmd === 'help') {
-            // Lista de comandos útiles para el usuario
+            // Mostramos el manual de usuario básico
             consoleContent.innerHTML += "Comandos: ls, cd [tema], clear, help";
         }
         
         else if (rawInput !== "") {
-            // Respuesta para cualquier texto que no sea un comando válido
+            // Si escribió algo que no existe en nuestra lógica, avisamos del error
             consoleContent.innerHTML += `<span style="color: #ff5f56;">Comando '${cmd}' no reconocido.</span>`;
         }
 
-        // Limpia el input y el texto visual para el siguiente comando
+        // Limpiamos los campos de entrada para que queden listos para el siguiente comando
         inputField.value = "";
         displayText.textContent = "";
         
-        // Pequeño delay para asegurar que el scroll baje después de que el DOM se actualice
+        // Desplazamos el scroll al final para que el nuevo texto siempre sea visible
         setTimeout(() => { contentDiv.scrollTop = contentDiv.scrollHeight; }, 10);
     }
 });
@@ -147,48 +147,48 @@ inputField.addEventListener('keydown', (e) => {
 /* --- ANIMACIÓN DE FONDO (MATRIX) --- */
 const canvas = document.getElementById('matrix-canvas');
 if (canvas) {
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d'); // Obtenemos el contexto de dibujo 2D
     
-    // Configura el lienzo para ocupar toda la ventana del navegador
+    // Ajustamos el lienzo para que cubra exactamente el tamaño de la ventana
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
     
-    const binary = "01"; // Caracteres que caerán en la lluvia
-    const fontSize = 16; // Tamaño de la fuente de los caracteres
-    const columns = canvas.width / fontSize; // Número de columnas basado en el ancho
-    const drops = []; // Array para rastrear la posición Y de cada columna
+    const binary = "01"; // Definimos los caracteres de la lluvia (estética binaria)
+    const fontSize = 16; // Definimos el tamaño de cada "bit"
+    const columns = canvas.width / fontSize; // Calculamos cuántas columnas caben en pantalla
+    const drops = []; // Array que guardará la posición Y actual de cada columna
     
-    // Inicializa todas las columnas en la posición Y = 1 (arriba)
+    // Inicializamos cada columna en la parte superior (1)
     for (let x = 0; x < columns; x++) drops[x] = 1;
 
     function drawMatrix() {
-        // Pinta un fondo negro muy transparente para crear el efecto de "estela" o rastro
+        // Pintamos un rectángulo negro semitransparente para crear el rastro de luz
         ctx.fillStyle = "rgba(13, 13, 13, 0.1)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        ctx.fillStyle = "#003300"; // Color verde oscuro para los bits
-        ctx.font = fontSize + "px monospace"; // Fuente estilo consola
+        ctx.fillStyle = "#003300"; // Color verde oscuro para los caracteres
+        ctx.font = fontSize + "px monospace"; // Definimos fuente monoespaciada
         
-        // Itera sobre cada columna para dibujar el carácter
+        // Iteramos por cada columna para dibujar el carácter correspondiente
         for (let i = 0; i < drops.length; i++) {
-            // Elige un carácter aleatorio (0 o 1)
+            // Seleccionamos 0 o 1 al azar
             const text = binary.charAt(Math.floor(Math.random() * binary.length));
-            // Dibuja el carácter en la posición X, Y actual
+            // Dibujamos el texto en su coordenada X e Y
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
             
-            // Si la gota pasa el final de la pantalla, tiene una probabilidad de volver al inicio
+            // Si la gota llega al final y se cumple el factor aleatorio, la reiniciamos al inicio (0)
             if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                 drops[i] = 0;
             }
-            drops[i]++; // Incrementa la posición Y para la siguiente iteración
+            drops[i]++; // Movemos la gota una fila hacia abajo
         }
     }
-    // Ejecuta la función de dibujo cada 50 milisegundos
+    // Ejecutamos el dibujo a 20 FPS (cada 50ms)
     setInterval(drawMatrix, 50);
 }
 
-// Acción final cuando la ventana termina de cargar todos los recursos
+// Acción de inicio al cargar completamente la página
 window.onload = () => {
-    typeWriter(); // Inicia la secuencia de bienvenida
-    inputField.setAttribute("maxlength", "15"); // Limita la longitud de los comandos por estética
+    typeWriter(); // Lanzamos la intro automática
+    inputField.setAttribute("maxlength", "25"); // Evitamos que escriban comandos demasiado largos
 };
