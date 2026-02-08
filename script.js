@@ -39,7 +39,7 @@ function finishLoading() {
 
 /* --- EVENTOS DE TECLADO --- */
 window.addEventListener('keydown', (e) => {
-    // Permite saltar la intro con Enter
+    // Si presiona Enter mientras carga, se completa la info
     if (e.key === 'Enter' && isTyping) finishLoading();
 });
 
@@ -49,7 +49,7 @@ inputField.addEventListener('input', (e) => {
 
 inputField.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !isTyping) {
-        const rawInput = inputField.value.trim();
+        const rawInput = inputField.value.trim(); // Texto tal cual lo escribió
         const parts = rawInput.split(' ');
         const cmd = parts[0].toLowerCase();
         const arg = parts[1] ? parts[1].toLowerCase() : null;
@@ -57,15 +57,18 @@ inputField.addEventListener('keydown', (e) => {
         // Imprimir comando en terminal
         consoleContent.innerHTML += `<br><span class="prompt">nocrutack@lab:~$</span> ${rawInput}<br>`;
 
-        // LÓGICA DE COMANDOS ESTRICTA
+        // --- LÓGICA ESTRICTA ---
+        
+        // 1. SOLO acepta 'ls' (si hay algo más, como 'ls lol', da error)
         if (rawInput === 'ls') {
             const lista = Object.keys(temas)
                 .map(t => `<span style="color: #5cb3ff; font-weight: bold;">${t}</span>`)
                 .join(' &nbsp;&nbsp; ');
             consoleContent.innerHTML += lista;
         } 
+        
+        // 2. SOLO acepta 'cd [tema]' (exactamente 2 partes)
         else if (cmd === 'cd') {
-            // Validación: Solo 'cd' + 'tema' (exactamente 2 partes)
             if (parts.length === 2 && temas[arg]) {
                 consoleContent.innerHTML += `Accediendo a ${arg}...`;
                 setTimeout(() => { abrirMonitor(arg); }, 500);
@@ -73,30 +76,35 @@ inputField.addEventListener('keydown', (e) => {
                 consoleContent.innerHTML += `<span style="color: #ff5f56;">Error: Directorio '${arg || ""}' no encontrado o comando inválido.</span>`;
             }
         }
+        
         else if (rawInput === 'clear') {
             consoleContent.innerHTML = "Terminal limpia.<br>";
         }
+        
         else if (rawInput === 'help') {
             consoleContent.innerHTML += "Comandos: ls, cd [tema], clear";
         }
+        
         else if (rawInput !== "") {
             consoleContent.innerHTML += `<span style="color: #ff5f56;">Comando no reconocido.</span>`;
         }
 
-        // Reset de input
+        // Limpieza de input
         inputField.value = "";
         displayText.textContent = "";
         setTimeout(() => { contentDiv.scrollTop = contentDiv.scrollHeight; }, 10);
     }
 });
 
-/* --- FUNCIONES DE INTERFAZ --- */
+/* --- FUNCIONES DEL MONITOR --- */
 function abrirMonitor(tema) {
     const monitor = document.getElementById('monitor');
     const monitorBody = document.getElementById('monitor-body');
-    const monitorTitle = document.getElementById('monitor-title');
+    
+    // Si tienes un elemento de título en el monitor:
+    const titleElem = document.getElementById('monitor-title');
+    if (titleElem) titleElem.innerText = `Explorando: ${tema}`;
 
-    if(monitorTitle) monitorTitle.innerText = `Explorador: /${tema}`;
     monitorBody.innerHTML = temas[tema];
     monitor.style.display = "flex";
 }
@@ -109,5 +117,5 @@ function closeMonitor() {
 /* --- INICIO --- */
 window.onload = () => {
     typeWriter();
-    inputField.setAttribute("maxlength", "15"); // Límite de caracteres
+    inputField.setAttribute("maxlength", "15"); // Limita que escriban cosas gigantes
 };
