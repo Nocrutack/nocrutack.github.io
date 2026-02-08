@@ -10,8 +10,12 @@
 
     <div class="terminal" onclick="document.getElementById('user-input').focus();">
         <div class="header">
-            <span class="buttons">● ● ●</span>
-            <span class="title">nocrutack@github: ~</span>
+            <div class="buttons">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <span class="title">nocrutack — bash — 80x24</span>
         </div>
 
         <div class="content">
@@ -29,11 +33,11 @@
     <div id="monitor" style="display: none;">
         <div class="monitor-frame">
             <div class="monitor-screen">
-                <nav class="monitor-nav">
+                <nav class="monitor-nav" style="display: flex; justify-content: space-between; padding: 10px; background: #333; color: white;">
                     <span id="monitor-title">Explorador de Archivos</span>
-                    <button id="back-btn" onclick="closeMonitor()">✖ VOLVER</button>
+                    <button id="back-btn" onclick="closeMonitor()" style="cursor:pointer; background: #ff5f56; border: none; color: white; border-radius: 5px; padding: 5px 10px;">✖ VOLVER</button>
                 </nav>
-                <div id="monitor-body">
+                <div id="monitor-body" style="padding: 20px; overflow-y: auto;">
                     </div>
             </div>
             <div class="monitor-base"></div>
