@@ -1,10 +1,10 @@
 /* --- CONFIGURACIÓN DE DATOS --- */
 const terminalText = ">> NOCRUTACK OS v1.0.4\n>> Cargando módulos de aprendizaje...\n>> Escribe 'ls' para ver mis temas o 'help' para ayuda.";
-const speed = 30; // Milisegundos entre cada letra
+const speed = 30; // Velocidad de la animación de escritura
 let i = 0;
-let isTyping = true; // Bloquea el input mientras se escribe la intro
+let isTyping = true; // Estado para saber si el sistema está en carga inicial
 
-// Directorios válidos que existen como archivos .html separados
+// Temas válidos para redirección (deben coincidir con nombres de archivos .html)
 const temas = {
     "redes": true,
     "linux": true,
@@ -12,67 +12,84 @@ const temas = {
 };
 
 /* --- SELECTORES DEL DOM --- */
-const inputField = document.getElementById('user-input'); // Input oculto que captura las teclas
-const displayText = document.getElementById('display-text'); // Lo que el usuario ve en pantalla
-const consoleContent = document.getElementById('typing-text'); // Historial de la terminal
-const contentDiv = document.querySelector('.content'); // Contenedor para controlar el scroll
-const themeToggle = document.getElementById('theme-toggle'); // Botón de cambio de modo
+const inputField = document.getElementById('user-input');
+const displayText = document.getElementById('display-text');
+const consoleContent = document.getElementById('typing-text');
+const contentDiv = document.querySelector('.content');
+const themeToggle = document.getElementById('theme-toggle');
 
 /* --- MOTOR DE ESCRITURA (INTRO) --- */
 function typeWriter() {
     if (i < terminalText.length) {
         let char = terminalText.charAt(i);
-        // Convierte los saltos de línea del string en etiquetas HTML <br>
+        // Inserta un salto de línea HTML si detecta \n, de lo contrario inserta el carácter
         consoleContent.innerHTML += (char === "\n") ? "<br>" : char;
         i++;
         setTimeout(typeWriter, speed);
-        // Baja el scroll automáticamente mientras escribe
+        // Auto-scroll hacia abajo mientras escribe
         contentDiv.scrollTop = contentDiv.scrollHeight;
     } else {
-        finishLoading(); // Activa la terminal al terminar
+        finishLoading();
     }
 }
 
+// Finaliza la animación y habilita la interacción del usuario
 function finishLoading() {
     if (!isTyping) return;
     isTyping = false;
-    // Asegura que todo el texto de la intro esté visible
     consoleContent.innerHTML = terminalText.replace(/\n/g, "<br>");
-    // Muestra la línea de prompt (nocrutack@lab:~$ )
     document.getElementById('input-line').style.display = "flex";
-    inputField.focus(); // Pone el cursor listo para escribir
+    inputField.focus();
 }
 
-/* --- LÓGICA DE CAMBIO DE MODO (CLARO/OSCURO) --- */
+/* --- LÓGICA DE PERSISTENCIA Y CAMBIO DE TEMA --- */
+
+/**
+ * Aplica el tema visual y actualiza el botón
+ * @param {string} theme - 'light' o 'dark'
+ */
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (themeToggle) themeToggle.innerText = 'MODO OSCURO';
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (themeToggle) themeToggle.innerText = 'MODO CLARO';
+    }
+}
+
+// Al cargar el script, recuperamos la preferencia guardada en el navegador
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) applyTheme(savedTheme);
+
+// Evento para el botón de cambio de modo
 if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-        // Obtenemos el estado actual del atributo 'data-theme' en el HTML
-        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    themeToggle.addEventListener('click', (e) => {
+        // Evitamos que el click "salga" del botón y dispare otros eventos
+        e.stopPropagation(); 
         
-        // Si estaba en claro, ponemos oscuro (null). Si estaba oscuro, ponemos claro ('light')
-        document.documentElement.setAttribute('data-theme', isLight ? '' : 'light');
+        const isCurrentlyLight = document.documentElement.getAttribute('data-theme') === 'light';
+        const nextTheme = isCurrentlyLight ? 'dark' : 'light';
         
-        // Cambiamos el texto del botón para que el usuario sepa qué pasará al hacer clic
-        themeToggle.innerText = isLight ? 'MODO CLARO' : 'MODO OSCURO';
-        
-        // Devolvemos el foco al input para que el usuario pueda seguir escribiendo sin cliquear
-        inputField.focus();
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme); // Guardamos la elección para otras páginas
+        inputField.focus(); // Mantenemos el foco en la terminal
     });
 }
 
 /* --- EVENTOS DE TECLADO --- */
 
-// Si el usuario presiona Enter durante la intro, esta se completa instantáneamente
+// Saltar la animación de intro al presionar Enter
 window.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && isTyping) finishLoading();
 });
 
-// Refleja en tiempo real lo que se escribe en el input oculto hacia el span visual
+// Sincronizar el input invisible con lo que se ve en pantalla
 inputField.addEventListener('input', (e) => {
     displayText.textContent = e.target.value;
 });
 
-// Procesador de comandos cuando se presiona Enter
+// Procesador de comandos de la terminal
 inputField.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !isTyping) {
         const rawInput = inputField.value.trim();
@@ -80,94 +97,94 @@ inputField.addEventListener('keydown', (e) => {
         const cmd = parts[0].toLowerCase();
         const arg = parts[1] ? parts[1].toLowerCase() : null;
 
-        // Imprime el comando ejecutado en el historial de la consola
+        // Mostrar el comando ejecutado en la consola
         consoleContent.innerHTML += `<br><span class="prompt">nocrutack@lab:~$</span> ${rawInput}<br>`;
 
         /* --- LÓGICA DE COMANDOS --- */
         
-        // COMANDO: ls (Listar temas)
-        if (rawInput === 'ls') {
+        if (cmd === 'ls') {
+            // Genera la lista de temas disponibles con colores
             const lista = Object.keys(temas)
                 .map(t => `<span style="color: #5cb3ff; font-weight: bold;">${t}</span>`)
                 .join(' &nbsp;&nbsp; ');
             consoleContent.innerHTML += lista;
         } 
         
-        // COMANDO: cd [tema] (Navegar a otra página)
         else if (cmd === 'cd') {
-            if (parts.length === 2 && temas[arg]) {
+            // Navegación a las páginas de los módulos
+            if (arg && temas[arg]) {
                 consoleContent.innerHTML += `<span style="color: #27c93f;">Abriendo entorno de ${arg}...</span>`;
-                
-                // Espera 800ms para que el usuario lea el mensaje antes de cambiar de página
                 setTimeout(() => { 
                     window.location.href = arg + ".html"; 
                 }, 800); 
-
             } else {
                 consoleContent.innerHTML += `<span style="color: #ff5f56;">Error: Directorio '${arg || ""}' no encontrado.</span>`;
             }
         }
         
-        // COMANDO: clear (Limpiar pantalla)
-        else if (rawInput === 'clear') {
+        else if (cmd === 'clear') {
+            // Limpia el historial visual
             consoleContent.innerHTML = "Terminal limpia.<br>";
         }
-        // COMANDO: help (Ayuda rápida)
-        else if (rawInput === 'help') {
-            consoleContent.innerHTML += "Comandos disponibles: ls, cd [tema], clear, help";
+        
+        else if (cmd === 'help') {
+            consoleContent.innerHTML += "Comandos: ls, cd [tema], clear, help";
         }
-        // CASO: Comando no válido
+        
         else if (rawInput !== "") {
             consoleContent.innerHTML += `<span style="color: #ff5f56;">Comando '${cmd}' no reconocido.</span>`;
         }
 
-        // Resetea el input para el siguiente comando
+        // Limpiar entrada
         inputField.value = "";
         displayText.textContent = "";
-        // Mantiene el scroll al fondo después de la respuesta
+        
+        // Scroll automático al final después de cada comando
         setTimeout(() => { contentDiv.scrollTop = contentDiv.scrollHeight; }, 10);
     }
 });
 
-/* --- ANIMACIÓN DE FONDO (MATRIX BINARIO) --- */
+/* --- ANIMACIÓN DE FONDO (MATRIX) --- */
 const canvas = document.getElementById('matrix-canvas');
 if (canvas) {
     const ctx = canvas.getContext('2d');
+    
+    // Ajustar el canvas al tamaño de la ventana
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
+    
     const binary = "01";
     const fontSize = 16;
-    const columns = canvas.width / fontSize; // Número de columnas basado en el ancho
+    const columns = canvas.width / fontSize;
     const drops = [];
     
-    // Inicializa la altura de cada columna de gotas
+    // Inicializar posiciones de las gotas
     for (let x = 0; x < columns; x++) drops[x] = 1;
 
     function drawMatrix() {
-        // Crea el rastro de desvanecimiento
+        // Fondo semitransparente para crear el efecto de rastro (trail)
         ctx.fillStyle = "rgba(13, 13, 13, 0.1)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Color de los bits
-        ctx.fillStyle = "#003300"; 
+        ctx.fillStyle = "#003300"; // Color del texto matrix
         ctx.font = fontSize + "px monospace";
         
         for (let i = 0; i < drops.length; i++) {
             const text = binary.charAt(Math.floor(Math.random() * binary.length));
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
             
-            // Si la gota llega al final o por azar, regresa arriba
+            // Si llega al final de la pantalla, vuelve arriba con probabilidad aleatoria
             if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                 drops[i] = 0;
             }
             drops[i]++;
         }
     }
-    setInterval(drawMatrix, 50); // Velocidad de la lluvia (50ms)
+    setInterval(drawMatrix, 50);
 }
 
-// Se ejecuta al terminar de cargar la página
+// Inicialización al cargar la ventana
 window.onload = () => {
-    typeWriter(); // Inicia la intro
-    inputField.setAttribute("maxlength", "15"); // Límite estético de comandos
+    typeWriter();
+    inputField.setAttribute("maxlength", "15");
 };
