@@ -1,92 +1,103 @@
+/* --- CONFIGURACIÓN DE DATOS --- */
 const terminalText = ">> NOCRUTACK OS v1.0.4\n>> Cargando módulos de aprendizaje...\n>> Escribe 'ls' para ver mis temas o 'help' para ayuda.";
-const speed = 40;
+const speed = 30;
 let i = 0;
+let isTyping = true; 
 
-// Base de datos de temas (Info rápida para la terminal)
 const temas = {
-    "redes": "Abriendo interfaz gráfica de Redes...",
-    "linux": "Abriendo interfaz gráfica de Linux...",
-    "seguridad": "Abriendo interfaz gráfica de Seguridad..."
+    "redes": "<h1>📁 Laboratorio de Redes</h1><p>Dominando protocolos TCP/IP y configuración Cisco.</p>",
+    "linux": "<h1>📁 Sistema Linux</h1><p>Administración de servidores y scripting en Bash.</p>",
+    "seguridad": "<h1>📁 Seguridad Informática</h1><p>Análisis de vulnerabilidades y defensa activa.</p>"
 };
 
+/* --- SELECTORES --- */
 const inputField = document.getElementById('user-input');
 const displayText = document.getElementById('display-text');
 const consoleContent = document.getElementById('typing-text');
 const contentDiv = document.querySelector('.content');
 
+/* --- MOTOR DE ESCRITURA --- */
 function typeWriter() {
     if (i < terminalText.length) {
         let char = terminalText.charAt(i);
         consoleContent.innerHTML += (char === "\n") ? "<br>" : char;
         i++;
         setTimeout(typeWriter, speed);
+        contentDiv.scrollTop = contentDiv.scrollHeight;
     } else {
-        document.getElementById('input-line').style.display = "flex";
-        inputField.focus();
+        finishLoading();
     }
 }
+
+function finishLoading() {
+    if (!isTyping) return;
+    isTyping = false;
+    consoleContent.innerHTML = terminalText.replace(/\n/g, "<br>");
+    document.getElementById('input-line').style.display = "flex";
+    inputField.focus();
+}
+
+/* --- EVENTOS DE TECLADO --- */
+window.addEventListener('keydown', (e) => {
+    // Permite saltar la intro con Enter
+    if (e.key === 'Enter' && isTyping) finishLoading();
+});
 
 inputField.addEventListener('input', (e) => {
     displayText.textContent = e.target.value;
 });
 
 inputField.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        const fullCommand = inputField.value.toLowerCase().trim();
-        const parts = fullCommand.split(' ');
-        const cmd = parts[0];
-        const arg = parts[1];
-        
-        consoleContent.innerHTML += `<br><span class="prompt">nocrutack@lab:~$</span> ${fullCommand}<br>`;
+    if (e.key === 'Enter' && !isTyping) {
+        const rawInput = inputField.value.trim();
+        const parts = rawInput.split(' ');
+        const cmd = parts[0].toLowerCase();
+        const arg = parts[1] ? parts[1].toLowerCase() : null;
 
-        if (cmd === 'ls') {
+        // Imprimir comando en terminal
+        consoleContent.innerHTML += `<br><span class="prompt">nocrutack@lab:~$</span> ${rawInput}<br>`;
+
+        // LÓGICA DE COMANDOS ESTRICTA
+        if (rawInput === 'ls') {
             const lista = Object.keys(temas)
                 .map(t => `<span style="color: #5cb3ff; font-weight: bold;">${t}</span>`)
                 .join(' &nbsp;&nbsp; ');
             consoleContent.innerHTML += lista;
         } 
         else if (cmd === 'cd') {
-            if (!arg) {
-                consoleContent.innerHTML += "Uso: cd [nombre_del_tema]";
-            } else if (temas[arg]) {
-                consoleContent.innerHTML += temas[arg];
-                // LLAMADA A LA FUNCIÓN DEL MONITOR
+            // Validación: Solo 'cd' + 'tema' (exactamente 2 partes)
+            if (parts.length === 2 && temas[arg]) {
+                consoleContent.innerHTML += `Accediendo a ${arg}...`;
                 setTimeout(() => { abrirMonitor(arg); }, 500);
             } else {
-                consoleContent.innerHTML += `Error: La carpeta '${arg}' no existe.`;
+                consoleContent.innerHTML += `<span style="color: #ff5f56;">Error: Directorio '${arg || ""}' no encontrado o comando inválido.</span>`;
             }
-        } 
-        else if (cmd === 'clear') {
-            consoleContent.innerHTML = "Terminal limpia. Sistema listo.<br>";
         }
-        else if (cmd === 'help') {
-            consoleContent.innerHTML += "Comandos: ls, cd [tema], clear, help";
+        else if (rawInput === 'clear') {
+            consoleContent.innerHTML = "Terminal limpia.<br>";
         }
-        else if (fullCommand !== "") {
-            consoleContent.innerHTML += `Comando no reconocido: ${cmd}`;
+        else if (rawInput === 'help') {
+            consoleContent.innerHTML += "Comandos: ls, cd [tema], clear";
+        }
+        else if (rawInput !== "") {
+            consoleContent.innerHTML += `<span style="color: #ff5f56;">Comando no reconocido.</span>`;
         }
 
+        // Reset de input
         inputField.value = "";
         displayText.textContent = "";
-        
-        setTimeout(() => {
-            contentDiv.scrollTop = contentDiv.scrollHeight;
-        }, 10);
+        setTimeout(() => { contentDiv.scrollTop = contentDiv.scrollHeight; }, 10);
     }
 });
 
-// FUNCIONES DEL MONITOR (Fuera del event listener)
+/* --- FUNCIONES DE INTERFAZ --- */
 function abrirMonitor(tema) {
     const monitor = document.getElementById('monitor');
-    const monitorBody = document.getElementById('monitor-body'); // Asegúrate de que este ID coincida con tu HTML
-    
-    const infoTemas = {
-        "redes": "<h1>📁 Laboratorio de Redes</h1><p>Dominando protocolos TCP/IP y configuración Cisco.</p><img src='https://via.placeholder.com/400x200' style='width:100%; border-radius:10px;'>",
-        "linux": "<h1>📁 Sistema Linux</h1><p>Administración de servidores y scripting en Bash.</p>",
-        "seguridad": "<h1>📁 Seguridad Informática</h1><p>Análisis de vulnerabilidades y defensa activa.</p>"
-    };
+    const monitorBody = document.getElementById('monitor-body');
+    const monitorTitle = document.getElementById('monitor-title');
 
-    monitorBody.innerHTML = infoTemas[tema];
+    if(monitorTitle) monitorTitle.innerText = `Explorador: /${tema}`;
+    monitorBody.innerHTML = temas[tema];
     monitor.style.display = "flex";
 }
 
@@ -95,15 +106,8 @@ function closeMonitor() {
     inputField.focus();
 }
 
-window.onload = typeWriter;
-// Ajuste para evitar que el teclado móvil tape el input
-window.addEventListener('resize', () => {
-    if (document.activeElement.tagName === 'INPUT') {
-        window.scrollTo(0, document.body.scrollHeight);
-    }
-});
-
-// Forzar el foco al input si tocas cualquier parte de la terminal
-document.querySelector('.terminal').addEventListener('click', () => {
-    inputField.focus();
-});
+/* --- INICIO --- */
+window.onload = () => {
+    typeWriter();
+    inputField.setAttribute("maxlength", "15"); // Límite de caracteres
+};
