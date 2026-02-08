@@ -8,32 +8,56 @@
     <link rel="icon" type="image/png" href="OD.png">
     
     <style>
+        /* --- VARIABLES DE COLOR --- */
+        /* Definimos los colores base (Modo Oscuro por defecto) */
+        :root {
+            --bg-color: #0d0d0d;      /* Fondo de la página */
+            --terminal-bg: #000;      /* Fondo de la terminal */
+            --text-color: #00ff41;    /* Color del texto (verde Matrix) */
+            --header-bg: #2d2d2d;    /* Barra superior gris */
+            --prompt-color: #0087ff;  /* Color azul del usuario */
+            --canvas-opacity: 1;      /* Visibilidad del fondo Matrix */
+        }
+
+        /* Colores que se activarán cuando la página tenga el atributo 'light' */
+        [data-theme="light"] {
+            --bg-color: #e5e5e5;      /* Gris claro estilo Apple */
+            --terminal-bg: #ffffff;   /* Terminal blanca */
+            --text-color: #1d1d1f;    /* Texto negro profundo */
+            --header-bg: #d1d1d6;    /* Barra superior gris plata */
+            --prompt-color: #005bb7;  /* Azul más oscuro para contraste */
+            --canvas-opacity: 0.15;   /* Matrix casi invisible para que no moleste */
+        }
+
         /* RESETEO: Quita márgenes por defecto del navegador */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* BODY: Fondo negro, ocupa toda la pantalla y centra la terminal */
+        /* BODY: Ahora usa la variable --bg-color con una transición suave de 0.3s */
         body {
-            background-color: #0d0d0d; 
+            background-color: var(--bg-color); 
             width: 100%;
             height: 100vh;
             display: flex;
-            justify-content: center; /* Centra horizontalmente */
-            align-items: center;     /* Centra verticalmente */
+            justify-content: center;
+            align-items: center;
             font-family: 'SF Mono', 'Monaco', monospace;
-            overflow: hidden;        /* Evita barras de scroll en el fondo */
+            overflow: hidden;
+            transition: background-color 0.3s ease; 
         }
 
-        /* CANVAS: El lienzo donde se dibuja la lluvia de Matrix */
+        /* CANVAS: Opacidad variable para que no moleste en el modo claro */
         #matrix-canvas {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 1; /* Se queda al fondo */
+            z-index: 1;
+            opacity: var(--canvas-opacity);
+            transition: opacity 0.3s ease;
         }
 
-        /* TERMINAL: El contenedor principal estilo ventana de Mac */
+        /* TERMINAL: Ahora usa la variable --terminal-bg */
         .terminal {
-            background: #000;
+            background: var(--terminal-bg);
             width: 90%;
             max-width: 800px; 
             height: 480px;
@@ -41,39 +65,36 @@
             border: 1px solid #333;
             box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             display: flex;
-            flex-direction: column; /* Apila la barra gris sobre el texto negro */
+            flex-direction: column;
             position: relative;
             overflow: hidden;
-            z-index: 10; /* Se pone por delante del Matrix */
+            z-index: 10;
+            transition: background-color 0.3s ease;
         }
 
-        /* RESPONSIVIDAD: Agranda la terminal solo si es una PC (pantalla grande) */
+        /* RESPONSIVIDAD PC */
         @media screen and (min-width: 1024px) {
-            .terminal {
-                max-width: 1100px;
-                height: 650px;
-            }
+            .terminal { max-width: 1100px; height: 650px; }
         }
 
-        /* HEADER: La barra gris superior con los botones */
+        /* HEADER: Usa la variable --header-bg */
         .header {
-            background: #2d2d2d;
+            background: var(--header-bg);
             height: 38px;
             display: flex;
             align-items: center;
             padding: 0 15px;
             position: relative;
-            flex-shrink: 0; /* Evita que la barra se encoja */
+            flex-shrink: 0;
+            transition: background-color 0.3s ease;
         }
 
-        /* BOTONES: Círculos de colores estilo macOS */
         .buttons { display: flex; gap: 8px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; }
         .red { background: #ff5f56; }
         .yellow { background: #ffbd2e; }
         .green { background: #27c93f; }
 
-        /* TÍTULO: Texto centrado en la barra gris */
         .title {
             position: absolute;
             width: 100%;
@@ -81,26 +102,40 @@
             color: #999;
             font-size: 13px;
             left: 0;
-            pointer-events: none; /* Ignora clics para no molestar */
+            pointer-events: none;
         }
 
-        /* CONTENT: Zona donde aparece el texto verde de la consola */
+        /* BOTÓN DE MODO: Estilo minimalista en la esquina derecha del header */
+        #theme-toggle {
+            position: absolute;
+            right: 15px;
+            background: #444;
+            color: white;
+            border: none;
+            padding: 3px 10px;
+            border-radius: 5px;
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 20;
+            font-weight: bold;
+        }
+
+        /* CONTENT: Usa la variable --text-color */
         .content {
             padding: 20px;
             font-size: 16px;
-            color: #00ff41; /* Verde neón */
-            overflow-y: auto; /* Permite scroll si hay mucho texto */
-            flex-grow: 1;    /* Ocupa todo el espacio disponible */
+            color: var(--text-color);
+            overflow-y: auto;
+            flex-grow: 1;
             line-height: 1.4;
+            transition: color 0.3s ease;
         }
 
-        /* PROMPT: El texto 'nocrutack@lab:~$' en azul */
-        .prompt { color: #0087ff; font-weight: bold; margin-right: 8px; }
+        /* PROMPT: Usa la variable --prompt-color */
+        .prompt { color: var(--prompt-color); font-weight: bold; margin-right: 8px; }
         
-        /* LÍNEA DE ENTRADA: Alinea el prompt con lo que escribes */
         #input-line { display: flex; align-items: center; }
 
-        /* INPUT: El cuadro de escritura real está oculto (invisible) */
         #user-input {
             background: transparent;
             border: none;
@@ -110,10 +145,9 @@
             position: absolute;
         }
 
-        /* DISPLAY TEXT: Lo que el usuario ve que está escribiendo */
-        #display-text { color: #00ff41; white-space: pre-wrap; }
+        /* DISPLAY TEXT: Se adapta al color del tema automáticamente */
+        #display-text { color: var(--text-color); white-space: pre-wrap; }
 
-        /* CURSOR: El guion parpadeante _ */
         .blink { animation: blinker 1s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
     </style>
@@ -131,6 +165,8 @@
                 <span class="dot green"></span>
             </div>
             <span class="title">nocrutack — bash — 80x24</span>
+            
+            <button id="theme-toggle">MODO CLARO</button>
         </div>
 
         <div class="content">
@@ -145,5 +181,17 @@
     </div>
 
     <script src="script.js"></script>
+    
+    <script>
+        const btn = document.getElementById('theme-toggle');
+        btn.addEventListener('click', () => {
+            // Revisa si el tema actual es 'light'
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            // Intercambia el atributo
+            document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+            // Cambia el texto del botón
+            btn.innerText = isLight ? 'MODO CLARO' : 'MODO OSCURO';
+        });
+    </script>
 </body>
 </html>
