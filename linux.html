@@ -7,19 +7,21 @@
     <link rel="icon" type="image/png" href="OD.png">
     
     <style>
-        /* --- VARIABLES DE TEMA ADAPTATIVAS --- */
+        /* --- 0. VARIABLES DE TEMA ADAPTATIVAS (MODO OSCURO POR DEFECTO) --- */
         :root {
             --bg-page: #0d0d0d;
-            --bg-card: #1a1a1a; /* Fondo tarjeta modo oscuro */
+            --bg-card: #1a1a1a; 
             --bg-nav: rgba(20, 20, 20, 0.8);
             --text-title: #ffffff;
             --text-body: #d2d2d7;
             --text-muted: #86868b;
             --border-color: #333336;
             --badge-bg: #333336;
+            --btn-bg: #444;
+            --btn-text: #fff;
         }
 
-        /* --- COLORES PARA MODO CLARO --- */
+        /* --- VARIABLES PARA MODO CLARO --- */
         [data-theme="light"] {
             --bg-page: #f5f5f7;
             --bg-card: #ffffff;
@@ -29,8 +31,11 @@
             --text-muted: #86868b;
             --border-color: #d2d2d7;
             --badge-bg: #e8e8ed;
+            --btn-bg: #d1d1d6; /* Botón más claro en modo luz */
+            --btn-text: #1d1d1f;
         }
 
+        /* --- 1. ESTILOS BASE --- */
         body {
             background-color: var(--bg-page);
             color: var(--text-body);
@@ -43,12 +48,12 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Barra de navegación superior */
+        /* --- 2. NAVEGACIÓN (NAV) --- */
         nav {
             width: 100%;
             height: 50px;
             background: var(--bg-nav);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px); /* Efecto Glassmorphism */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -61,6 +66,28 @@
             color: var(--text-title);
         }
 
+        /* Contenedor derecho para botones en el nav */
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Botón de cambio de tema universal */
+        #theme-toggle {
+            background: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        #theme-toggle:hover { opacity: 0.8; }
+
         .back-link {
             text-decoration: none;
             color: #0066cc;
@@ -70,7 +97,7 @@
 
         .back-link:hover { text-decoration: underline; }
 
-        /* Contenedor principal */
+        /* --- 3. CONTENEDOR Y TARJETAS --- */
         .container {
             margin-top: 100px;
             width: 90%;
@@ -119,7 +146,10 @@
 
     <nav>
         <span style="font-weight: 600;">Nocrutack Lab</span>
-        <a href="index.html" class="back-link">← Volver a Terminal</a>
+        <div class="nav-controls">
+            <button id="theme-toggle">MODO CLARO</button>
+            <a href="index.html" class="back-link">← Volver a Terminal</a>
+        </div>
     </nav>
 
     <div class="container">
@@ -140,13 +170,35 @@
     </div>
 
     <script>
-        // Esta función lee el localStorage al cargar para aplicar el tema guardado
+        const btn = document.getElementById('theme-toggle');
+
+        // 1. Función para aplicar el tema y actualizar el texto del botón
+        function applyTheme(theme) {
+            if (theme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                btn.innerText = 'MODO OSCURO';
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                btn.innerText = 'MODO CLARO';
+            }
+        }
+
+        // 2. Al cargar la página, leer la preferencia guardada en localStorage
         (function() {
             const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
+            if (savedTheme) {
+                applyTheme(savedTheme);
             }
         })();
+
+        // 3. Evento de clic para cambiar el tema manualmente desde esta página
+        btn.addEventListener('click', () => {
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+            const nextTheme = isLight ? 'dark' : 'light';
+            
+            applyTheme(nextTheme);
+            localStorage.setItem('theme', nextTheme); // Guarda la elección para index.html y otras
+        });
     </script>
 
 </body>
