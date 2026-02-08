@@ -2,161 +2,148 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nocrutack | Linux System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Nocrutack | Cybersecurity Lab</title>
+    
     <link rel="icon" type="image/png" href="OD.png">
     
     <style>
-        /* Tipografía inspirada en San Francisco de Apple */
+        /* RESETEO: Quita márgenes por defecto del navegador */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* BODY: Fondo negro, ocupa toda la pantalla y centra la terminal */
         body {
-            background-color: #f5f5f7;
-            color: #1d1d1f;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+            background-color: #0d0d0d; 
+            width: 100%;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: center; /* Centra horizontalmente */
+            align-items: center;     /* Centra verticalmente */
+            font-family: 'SF Mono', 'Monaco', monospace;
+            overflow: hidden;        /* Evita barras de scroll en el fondo */
         }
 
-        /* Barra de navegación superior (Glassmorphism) */
-        nav {
-            width: 100%;
-            height: 52px;
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: saturate(180%) blur(20px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* CANVAS: El lienzo donde se dibuja la lluvia de Matrix */
+        #matrix-canvas {
             position: fixed;
             top: 0;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            z-index: 1000;
+            left: 0;
+            z-index: 1; /* Se queda al fondo */
         }
 
-        .nav-content {
-            width: 100%;
-            max-width: 980px;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 22px;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #0066cc;
-            font-size: 14px;
-            letter-spacing: -0.01em;
-        }
-
-        nav a:hover { text-decoration: underline; }
-
-        /* Contenedor del artículo */
-        .main-content {
-            margin-top: 100px;
+        /* TERMINAL: El contenedor principal estilo ventana de Mac */
+        .terminal {
+            background: #000;
             width: 90%;
-            max-width: 800px;
-            animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .category {
-            font-size: 12px;
-            font-weight: 600;
-            color: #86868b;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 8px;
-            display: block;
-        }
-
-        h1 {
-            font-size: 48px;
-            font-weight: 700;
-            letter-spacing: -0.015em;
-            margin: 0 0 40px 0;
-        }
-
-        /* Diseño de Tarjetas Informativas */
-        .info-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-
-        .info-card h2 {
-            font-size: 24px;
-            margin-top: 0;
-        }
-
-        .info-card p {
-            font-size: 19px;
-            line-height: 1.47;
-            font-weight: 400;
-            color: #3a3a3c;
-        }
-
-        .code-block {
-            background: #1d1d1f;
-            color: #f5f5f7;
-            padding: 15px;
+            max-width: 800px; 
+            height: 480px;
             border-radius: 12px;
-            font-family: 'SF Mono', monospace;
-            font-size: 14px;
-            margin: 20px 0;
-            overflow-x: auto;
+            border: 1px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column; /* Apila la barra gris sobre el texto negro */
+            position: relative;
+            overflow: hidden;
+            z-index: 10; /* Se pone por delante del Matrix */
         }
 
-        /* Footer */
-        footer {
-            margin-top: 50px;
-            padding: 40px 0;
-            border-top: 1px solid #d2d2d7;
-            width: 90%;
-            max-width: 800px;
-            color: #86868b;
-            font-size: 12px;
+        /* RESPONSIVIDAD: Agranda la terminal solo si es una PC (pantalla grande) */
+        @media screen and (min-width: 1024px) {
+            .terminal {
+                max-width: 1100px;
+                height: 650px;
+            }
         }
+
+        /* HEADER: La barra gris superior con los botones */
+        .header {
+            background: #2d2d2d;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            position: relative;
+            flex-shrink: 0; /* Evita que la barra se encoja */
+        }
+
+        /* BOTONES: Círculos de colores estilo macOS */
+        .buttons { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        /* TÍTULO: Texto centrado en la barra gris */
+        .title {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+            left: 0;
+            pointer-events: none; /* Ignora clics para no molestar */
+        }
+
+        /* CONTENT: Zona donde aparece el texto verde de la consola */
+        .content {
+            padding: 20px;
+            font-size: 16px;
+            color: #00ff41; /* Verde neón */
+            overflow-y: auto; /* Permite scroll si hay mucho texto */
+            flex-grow: 1;    /* Ocupa todo el espacio disponible */
+            line-height: 1.4;
+        }
+
+        /* PROMPT: El texto 'nocrutack@lab:~$' en azul */
+        .prompt { color: #0087ff; font-weight: bold; margin-right: 8px; }
+        
+        /* LÍNEA DE ENTRADA: Alinea el prompt con lo que escribes */
+        #input-line { display: flex; align-items: center; }
+
+        /* INPUT: El cuadro de escritura real está oculto (invisible) */
+        #user-input {
+            background: transparent;
+            border: none;
+            color: transparent;
+            outline: none;
+            width: 1px;
+            position: absolute;
+        }
+
+        /* DISPLAY TEXT: Lo que el usuario ve que está escribiendo */
+        #display-text { color: #00ff41; white-space: pre-wrap; }
+
+        /* CURSOR: El guion parpadeante _ */
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="nav-content">
-            <span style="font-weight: 600; font-size: 14px;">Nocrutack Lab</span>
-            <a href="index.html">← Salir a Terminal</a>
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="terminal" onclick="document.getElementById('user-input').focus();">
+        
+        <div class="header">
+            <div class="buttons">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <span class="title">nocrutack — bash — 80x24</span>
         </div>
-    </nav>
 
-    <main class="main-content">
-        <span class="category">Sistemas Operativos</span>
-        <h1>Linux System</h1>
-
-        <div class="info-card">
-            <h2>Introducción al Kernel</h2>
-            <p>Linux es el pilar fundamental de la ciberseguridad moderna. Como sistema de código abierto, permite un control granular sobre el hardware y el tráfico de red, facilitando auditorías profundas.</p>
+        <div class="content">
+            <p id="typing-text"></p>
             
-            <div class="code-block">
-                $ uname -a <br>
-                Linux lab-nocrutack 6.1.0-kali-amd64
+            <div id="input-line" style="display: none;">
+                <span class="prompt">nocrutack@lab:~$</span>
+                <span id="display-text"></span><span class="blink">_</span>
+                <input type="text" id="user-input" autofocus autocomplete="off" maxlength="15">
             </div>
         </div>
+    </div>
 
-        <div class="info-card">
-            <h2>Habilidades Clave</h2>
-            <p>En este módulo dominaremos la gestión de permisos, el análisis de logs en <code>/var/log</code> y la automatización de tareas críticas mediante Bash Scripting.</p>
-        </div>
-
-        <footer>
-            Copyright © 2026 Nocrutack. Todos los derechos reservados.
-        </footer>
-    </main>
-
+    <script src="script.js"></script>
 </body>
 </html>
