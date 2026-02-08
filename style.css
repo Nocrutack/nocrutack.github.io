@@ -1,192 +1,185 @@
 /* --- 0. VARIABLES DE TEMA (MODO OSCURO POR DEFECTO) --- */
 :root {
-    /* Definición de colores base para la estética Hacker/Matrix */
-    --bg-page: #0d0d0d;        /* Color del lienzo de fondo profundo */
-    --bg-terminal: #000;       /* Negro puro para el interior de la terminal */
-    --bg-header: #2d2d2d;      /* Gris oscuro para la barra de herramientas superior */
-    --text-main: #00ff41;      /* Color verde "Phosphor" clásico de monitores antiguos */
-    --text-prompt: #0087ff;    /* Azul eléctrico para resaltar el usuario en el prompt */
-    --matrix-opacity: 1;       /* Opacidad máxima para la lluvia de bits de fondo */
-    --shadow-color: rgba(0,0,0,0.7); /* Sombra densa para dar profundidad a la ventana */
-    --border-terminal: #333;   /* Borde oscuro para delimitar la terminal en el fondo negro */
+    /* Colores base para la estética Hacker/Matrix */
+    --bg-page: #0d0d0d;         /* Fondo de la página detrás de la terminal */
+    --bg-terminal: #000;        /* Interior de la terminal */
+    --bg-header: #2d2d2d;       /* Barra superior de la ventana */
+    --text-main: #00ff41;       /* Verde neón clásico */
+    --text-prompt: #0087ff;     /* Azul para el usuario@lab */
+    --matrix-opacity: 1;        /* Visibilidad del canvas de fondo */
+    --shadow-color: rgba(0,0,0,0.7); /* Sombra para profundidad */
+    --border-terminal: #333;    /* Borde sutil de la ventana */
 }
 
 /* --- VARIABLES PARA MODO CLARO --- */
-/* Estas variables sobreescriben a las anteriores cuando el atributo data-theme es 'light' */
+/* Se activan mediante JavaScript con el atributo data-theme="light" */
 [data-theme="light"] {
-    --bg-page: #e5e5e7;        /* Gris claro neutro (estética Apple/macOS) */
-    --bg-terminal: #ffffff;    /* Fondo blanco para una lectura de alta claridad */
-    --bg-header: #d1d1d6;      /* Gris plata para la barra superior estilo aluminio */
-    --text-main: #1d1d1f;      /* Negro tipográfico de alto contraste */
-    --text-prompt: #005bb7;    /* Azul marino para mantener la jerarquía en fondo blanco */
-    --matrix-opacity: 0.15;    /* Matrix se reduce a una textura sutil de fondo */
-    --shadow-color: rgba(0,0,0,0.1); /* Sombra suave para un diseño más ligero */
-    --border-terminal: #bcbcbc; /* Borde gris medio para definir la terminal blanca */
+    --bg-page: #e5e5e7;         /* Gris claro (estética Apple) */
+    --bg-terminal: #ffffff;     /* Terminal blanca */
+    --bg-header: #d1d1d6;       /* Barra superior gris plata */
+    --text-main: #1d1d1f;       /* Texto negro tipográfico */
+    --text-prompt: #005bb7;     /* Azul oscuro para contraste */
+    --matrix-opacity: 0.15;     /* Matrix casi invisible */
+    --shadow-color: rgba(0,0,0,0.1); /* Sombra suave */
+    --border-terminal: #bcbcbc; /* Borde gris medio */
 }
 
-/* --- 1. CONFIGURACIÓN GLOBAL Y CUERPO --- */
+/* --- 1. CONFIGURACIÓN GLOBAL --- */
 html, body {
-    background-color: var(--bg-page); /* Aplica el color de fondo dinámico */
-    margin: 0;                        /* Elimina márgenes externos del navegador */
-    padding: 0;                       /* Elimina rellenos internos */
-    width: 100%;                      /* Ocupa todo el ancho de la pantalla */
-    min-height: 100vh;                /* Ocupa al menos toda la altura visual */
-    display: flex;                    /* Activa el contenedor flexible */
-    justify-content: center;          /* Centra la terminal horizontalmente */
-    align-items: center;              /* Centra la terminal verticalmente */
-    font-family: 'SF Mono', Monaco, monospace; /* Tipografía monoespaciada de sistema */
-    overflow: hidden;                 /* Evita barras de scroll accidentales en el body */
-    transition: background-color 0.3s ease; /* Suaviza el cambio de color entre temas */
+    background-color: var(--bg-page);
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'SF Mono', Monaco, monospace;
+    overflow: hidden; /* Evita scrolls innecesarios en el body */
+    transition: background-color 0.3s ease;
 }
 
-/* Estilo para el lienzo de la animación Matrix */
+/* Animación de fondo Matrix */
 #matrix-canvas {
-    position: fixed;                  /* Se mantiene fijo detrás de todo el contenido */
-    top: 0; left: 0;                  /* Alineado a la esquina superior izquierda */
-    z-index: 1;                       /* Capa inferior (detrás de la terminal) */
-    opacity: var(--matrix-opacity);   /* Controlado por la variable de tema */
-    transition: opacity 0.5s ease;    /* Transición gradual de visibilidad del fondo */
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 1;
+    opacity: var(--matrix-opacity);
+    transition: opacity 0.5s ease;
 }
 
 /* --- 2. CONTENEDOR DE LA TERMINAL --- */
 .terminal {
-    background: var(--bg-terminal);   /* Color interior según el tema */
-    width: 95%;                       /* Ancho adaptativo para móviles */
-    max-width: 800px;                 /* Límite de ancho para pantallas grandes */
-    height: 480px;                    /* Altura fija inicial */
-    border-radius: 12px;              /* Bordes redondeados modernos */
-    border: 1px solid var(--border-terminal); /* Borde que cambia con el tema */
-    box-shadow: 0 20px 50px var(--shadow-color); /* Sombra dinámica */
-    display: flex;                    /* Flexbox para apilar header y contenido */
-    flex-direction: column;           /* Elementos hijos en columna */
-    position: relative;               /* Referencia para posicionamiento interno */
-    overflow: hidden;                 /* Recorta esquinas del contenido interno */
-    z-index: 10;                      /* Por encima del canvas de Matrix */
-    transition: all 0.3s ease;        /* Suaviza cambios de color, bordes y sombras */
+    background: var(--bg-terminal);
+    width: 95%;
+    max-width: 800px;
+    height: 480px;
+    border-radius: 12px;
+    border: 1px solid var(--border-terminal);
+    box-shadow: 0 20px 50px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    z-index: 10;
+    transition: all 0.3s ease;
 }
 
 /* --- 3. BARRA SUPERIOR (HEADER) --- */
 .header {
-    background: var(--bg-header);     /* Fondo de la barra de control */
-    height: 38px;                     /* Altura compacta estilo sistema operativo */
-    display: flex;                    /* Alineación flexible de botones y título */
-    align-items: center;              /* Centrado vertical de elementos */
-    padding: 0 15px;                  /* Espaciado lateral interno */
-    position: relative;               /* Permite posicionar el título en el centro absoluto */
-    transition: background-color 0.3s ease; /* Transición de color del header */
+    background: var(--bg-header);
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    position: relative;
+    transition: background-color 0.3s ease;
 }
 
-/* Botón de cambio de tema (Interruptor) */
-#theme-toggle {
-    position: absolute;               /* Posicionamiento independiente del flujo */
-    right: 15px;                      /* Anclado a la derecha */
-    background: #444;                 /* Color de fondo gris neutro */
-    color: white;                     /* Texto del botón en blanco */
-    border: none;                     /* Sin bordes predeterminados */
-    padding: 4px 10px;                /* Tamaño interno del botón */
-    border-radius: 5px;               /* Esquinas redondeadas del botón */
-    font-size: 10px;                  /* Texto pequeño y técnico */
-    cursor: pointer;                  /* Cambia el cursor a mano al pasar por encima */
-    font-weight: bold;                /* Texto resaltado */
-    z-index: 20;                      /* Asegura estar sobre el título si hay conflicto */
-}
-
+/* Botones de ventana estilo Mac */
 .buttons {
-    display: flex;                    /* Alinea los "puntos" de colores */
-    gap: 8px;                         /* Espacio entre cada punto */
-    z-index: 2;                       /* Asegura visibilidad sobre el fondo */
+    display: flex;
+    gap: 8px;
+    z-index: 2;
 }
 
 .dot {
-    width: 12px;                      /* Diámetro de los botones circulares */
-    height: 12px;                     /* Altura para formar un círculo perfecto */
-    border-radius: 50%;               /* Convierte el cuadrado en círculo */
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
 }
 
-/* Colores de los botones de ventana estilo macOS */
 .red { background: #ff5f56; border: 0.5px solid #e0443e; }
 .yellow { background: #ffbd2e; border: 0.5px solid #dea123; }
 .green { background: #27c93f; border: 0.5px solid #1aab29; }
 
+/* Título de la terminal */
 .title {
-    position: absolute;               /* Se posiciona fuera del flujo de los puntos */
-    width: 100%;                      /* Ocupa todo el ancho para poder centrar */
-    left: 0;                          /* Desde el extremo izquierdo */
-    text-align: center;               /* Centra el texto del título */
-    color: #999;                      /* Color gris tenue para no distraer */
-    font-size: 13px;                  /* Tamaño de fuente estándar de sistema */
-    pointer-events: none;             /* Permite hacer clic "a través" del texto */
+    position: absolute;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    pointer-events: none;
 }
 
-/* --- 4. ÁREA DE TEXTO Y CONTENIDO --- */
+/* Botón de cambio de tema en el Header */
+#theme-toggle {
+    position: absolute;
+    right: 15px;
+    background: #444;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    z-index: 20;
+}
+
+/* --- 4. ÁREA DE CONTENIDO (TEXTO) --- */
 .content {
-    padding: 20px;                    /* Espaciado interno para el texto */
-    font-size: 15px;                  /* Legibilidad óptima */
-    line-height: 1.5;                 /* Espaciado entre líneas para evitar fatiga */
-    color: var(--text-main);          /* Color dinámico (verde o negro) */
-    overflow-y: auto;                 /* Habilita scroll vertical si el texto excede el alto */
-    flex-grow: 1;                     /* Ocupa todo el espacio sobrante de la terminal */
-    transition: color 0.3s ease;      /* Suaviza el cambio de color de las letras */
+    padding: 20px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-main);
+    overflow-y: auto; /* Permite scroll interno */
+    flex-grow: 1;
+    transition: color 0.3s ease;
 }
 
-/* Personalización de la barra de desplazamiento (Scrollbar) */
-.content::-webkit-scrollbar { width: 6px; } /* Ancho de la barra */
-.content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; } /* Estilo del "tirador" */
+/* Scrollbar personalizada */
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-thumb { 
+    background: #333; 
+    border-radius: 10px; 
+}
 
-/* --- 5. LÍNEA DE ENTRADA (PROMPT) --- */
-.prompt { 
-    color: var(--text-prompt);        /* Color dinámico del prompt azul */
-    font-weight: bold;                /* Resalta la identidad del usuario */
-    margin-right: 8px;                /* Espacio antes de donde escribe el usuario */
+/* --- 5. LÍNEA DE COMANDOS (PROMPT) --- */
+.prompt {
+    color: var(--text-prompt);
+    font-weight: bold;
+    margin-right: 8px;
 }
 
 #input-line {
-    display: flex;                    /* Alinea prompt + texto de usuario + cursor */
-    align-items: center;              /* Centrado vertical de la línea de escritura */
+    display: flex;
+    align-items: center;
 }
 
+/* El input invisible que captura las teclas */
 #user-input {
-    background: transparent;          /* Oculta el fondo del input */
-    border: none;                     /* Elimina bordes del input */
-    color: transparent;               /* Hace el texto invisible (lo manejamos con display-text) */
-    outline: none;                    /* Elimina el recuadro de foco del navegador */
-    width: 1px;                       /* Ancho mínimo para mantener funcionalidad */
-    position: absolute;               /* No ocupa espacio físico visual */
+    background: transparent;
+    border: none;
+    color: transparent;
+    outline: none;
+    width: 1px;
+    position: absolute;
 }
 
+/* El texto que se muestra en pantalla mientras escribes */
 #display-text {
-    color: var(--text-main);          /* Color dinámico del texto escrito */
-    white-space: pre-wrap;            /* Respeta espacios y saltos de línea */
-    word-break: break-all;            /* Rompe palabras largas para evitar desbordamiento */
+    color: var(--text-main);
+    white-space: pre-wrap;
+    word-break: break-all;
 }
 
-/* Animación de parpadeo para el cursor simulado '_' */
-.blink { 
-    animation: blinker 1s linear infinite; 
+/* Cursor parpadeante */
+.blink {
+    animation: blinker 1s linear infinite;
 }
 
-@keyframes blinker { 50% { opacity: 0; } } /* El cursor desaparece y aparece cada segundo */
+@keyframes blinker { 50% { opacity: 0; } }
 
-/* --- 6. MONITOR GUI (VENTANA EMERGENTE) --- */
-#monitor {
-    position: fixed;                  /* Superpuesto a toda la pantalla */
-    top: 0; left: 0;                  /* Cubre desde el origen */
-    width: 100%; height: 100%;        /* Dimensiones totales */
-    background: rgba(0,0,0,0.8);      /* Oscurece el fondo */
-    backdrop-filter: blur(5px);       /* Efecto de desenfoque detrás del monitor */
-    z-index: 1000;                    /* Máxima prioridad visual */
-    display: none;                    /* Oculto por defecto (se activa con JS) */
-    justify-content: center;          /* Centrado horizontal de la UI */
-    align-items: center;              /* Centrado vertical de la UI */
-}
-
-/* --- 7. RESPONSIVIDAD (PC / PANTALLAS GRANDES) --- */
+/* --- 6. RESPONSIVIDAD (PANTALLAS GRANDES) --- */
 @media screen and (min-width: 1024px) {
     .terminal {
-        max-width: 1100px;            /* Mayor amplitud en computadoras */
-        height: 650px;                /* Mayor altura para ver más historial */
+        max-width: 1100px;
+        height: 650px;
     }
     .content {
-        font-size: 17px;              /* Texto ligeramente más grande para pantallas HD */
+        font-size: 17px;
     }
 }
