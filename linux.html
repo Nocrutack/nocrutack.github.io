@@ -9,29 +9,30 @@
     <style>
         /* --- 0. VARIABLES DE TEMA ADAPTATIVAS (MODO OSCURO POR DEFECTO) --- */
         :root {
-            --bg-page: #0d0d0d;
-            --bg-card: #1a1a1a; 
-            --bg-nav: rgba(20, 20, 20, 0.8);
-            --text-title: #ffffff;
-            --text-body: #d2d2d7;
-            --text-muted: #86868b;
-            --border-color: #333336;
-            --badge-bg: #333336;
-            --btn-bg: #444;
-            --btn-text: #fff;
+            --bg-page: #0d0d0d;         /* Fondo general oscuro */
+            --bg-card: #1a1a1a;         /* Fondo de la tarjeta */
+            --bg-nav: rgba(20, 20, 20, 0.8); /* Barra de navegación traslúcida */
+            --text-title: #ffffff;      /* Títulos en blanco */
+            --text-body: #d2d2d7;       /* Texto gris claro estilo Apple */
+            --text-muted: #86868b;      /* Texto secundario/desactivado */
+            --border-color: #333336;    /* Bordes sutiles */
+            --badge-bg: #333336;        /* Fondo de etiquetas */
+            --btn-bg: #444;             /* Botón modo oscuro */
+            --btn-text: #fff;           /* Texto del botón */
         }
 
         /* --- VARIABLES PARA MODO CLARO --- */
+        /* Estas variables se activan cuando el atributo 'data-theme' es 'light' */
         [data-theme="light"] {
-            --bg-page: #f5f5f7;
-            --bg-card: #ffffff;
+            --bg-page: #f5f5f7;         /* Gris muy claro de fondo */
+            --bg-card: #ffffff;         /* Tarjeta blanca pura */
             --bg-nav: rgba(255, 255, 255, 0.8);
-            --text-title: #1d1d1f;
-            --text-body: #424245;
+            --text-title: #1d1d1f;      /* Texto negro profundo */
+            --text-body: #424245;       /* Gris oscuro para cuerpo */
             --text-muted: #86868b;
-            --border-color: #d2d2d7;
+            --border-color: #d2d2d7;    /* Bordes grises claros */
             --badge-bg: #e8e8ed;
-            --btn-bg: #d1d1d6; /* Botón más claro en modo luz */
+            --btn-bg: #d1d1d6;          /* Botón gris plata */
             --btn-text: #1d1d1f;
         }
 
@@ -45,7 +46,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave de colores */
         }
 
         /* --- 2. NAVEGACIÓN (NAV) --- */
@@ -53,27 +54,26 @@
             width: 100%;
             height: 50px;
             background: var(--bg-nav);
-            backdrop-filter: blur(20px); /* Efecto Glassmorphism */
+            backdrop-filter: blur(20px); /* Efecto de desenfoque de cristal */
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
-            position: fixed;
+            position: fixed; /* Mantiene la barra siempre arriba */
             top: 0;
             box-sizing: border-box;
             border-bottom: 0.5px solid var(--border-color);
             z-index: 100;
-            color: var(--text-title);
         }
 
-        /* Contenedor derecho para botones en el nav */
+        /* Contenedor derecho para agrupar botón y link */
         .nav-controls {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        /* Botón de cambio de tema universal */
+        /* Estilo del botón de interruptor de tema */
         #theme-toggle {
             background: var(--btn-bg);
             color: var(--btn-text);
@@ -99,10 +99,10 @@
 
         /* --- 3. CONTENEDOR Y TARJETAS --- */
         .container {
-            margin-top: 100px;
+            margin-top: 100px; /* Espacio para no quedar debajo del nav */
             width: 90%;
             max-width: 800px;
-            animation: fadeIn 0.8s ease;
+            animation: fadeIn 0.8s ease; /* Animación de entrada al cargar */
         }
 
         @keyframes fadeIn {
@@ -145,7 +145,7 @@
 <body>
 
     <nav>
-        <span style="font-weight: 600;">Nocrutack Lab</span>
+        <span style="font-weight: 600; color: var(--text-title);">Nocrutack Lab</span>
         <div class="nav-controls">
             <button id="theme-toggle">MODO CLARO</button>
             <a href="index.html" class="back-link">← Volver a Terminal</a>
@@ -170,35 +170,44 @@
     </div>
 
     <script>
+        // Seleccionamos el botón por su ID
         const btn = document.getElementById('theme-toggle');
 
-        // 1. Función para aplicar el tema y actualizar el texto del botón
+        /**
+         * Función para aplicar el tema visualmente y actualizar el texto del botón
+         * @param {string} theme - Puede ser 'light' o null/oscuro
+         */
         function applyTheme(theme) {
             if (theme === 'light') {
                 document.documentElement.setAttribute('data-theme', 'light');
-                btn.innerText = 'MODO OSCURO';
+                if(btn) btn.innerText = 'MODO OSCURO';
             } else {
                 document.documentElement.removeAttribute('data-theme');
-                btn.innerText = 'MODO CLARO';
+                if(btn) btn.innerText = 'MODO CLARO';
             }
         }
 
-        // 2. Al cargar la página, leer la preferencia guardada en localStorage
+        /**
+         * IIFE (Función ejecutada inmediatamente) para cargar el tema al abrir la página
+         */
         (function() {
-            const savedTheme = localStorage.getItem('theme');
+            const savedTheme = localStorage.getItem('theme'); // Recupera la elección de la terminal
             if (savedTheme) {
                 applyTheme(savedTheme);
             }
         })();
 
-        // 3. Evento de clic para cambiar el tema manualmente desde esta página
-        btn.addEventListener('click', () => {
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            const nextTheme = isLight ? 'dark' : 'light';
-            
-            applyTheme(nextTheme);
-            localStorage.setItem('theme', nextTheme); // Guarda la elección para index.html y otras
-        });
+        // Evento que escucha el clic en el botón para alternar el tema
+        if (btn) {
+            btn.addEventListener('click', () => {
+                // Comprobamos si actualmente estamos en modo claro
+                const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+                const nextTheme = isLight ? 'dark' : 'light'; // Elegimos el siguiente estado
+                
+                applyTheme(nextTheme); // Aplicamos visualmente
+                localStorage.setItem('theme', nextTheme); // Guardamos para que index.html lo sepa
+            });
+        }
     </script>
 
 </body>
