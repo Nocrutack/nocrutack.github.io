@@ -4,46 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Nocrutack | Cybersecurity Lab</title>
+    
     <style>
-        /* --- PEGADO AQUÍ PARA QUE NO FALLE --- */
+        /* --- ESTILOS CSS --- */
         html, body {
-            background-color: #0d0d0d !important;
+            background-color: #0d0d0d !important; /* Fondo oscuro obligatorio */
             margin: 0; padding: 0; width: 100%; min-height: 100vh;
             display: flex; justify-content: center; align-items: center;
             font-family: 'SF Mono', 'Monaco', monospace; overflow: hidden;
         }
+
+        /* Contenedor principal de la ventana */
         .terminal {
             background: #000; width: 90%; max-width: 800px; height: 480px;
             border-radius: 12px; border: 1px solid #333;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
             position: relative; overflow: hidden;
+            z-index: 10; /* Asegura que la terminal esté por encima del fondo animado */
         }
+
+        /* Barra superior estilo macOS */
         .header {
             background: #2d2d2d; height: 38px; display: flex; align-items: center;
             padding: 0 15px; position: relative;
         }
+
+        /* Botones de colores (Rojo, Amarillo, Verde) */
         .buttons { display: flex; gap: 8px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
+        .red { background: #ff5f56; } 
+        .yellow { background: #ffbd2e; } 
+        .green { background: #27c93f; }
+
+        /* Título central de la barra */
         .title { position: absolute; width: 100%; text-align: center; color: #999; font-size: 13px; pointer-events: none; }
+
+        /* Cuerpo de la terminal donde sale el texto */
         .content { padding: 20px; font-size: 15px; color: #00ff41; overflow-y: auto; flex-grow: 1; }
+
+        /* Estilo del prompt (usuario@lab) y el input */
         .prompt { color: #0087ff; font-weight: bold; margin-right: 8px; }
         #input-line { display: flex; align-items: center; }
+
+        /* El input real es invisible para que no rompa el diseño */
         #user-input {
             background: transparent !important; border: none !important;
             color: transparent !important; outline: none !important;
             width: 1px; position: absolute; appearance: none;
         }
+
+        /* Texto que se ve mientras el usuario teclea */
         #display-text { color: #00ff41; white-space: pre-wrap; }
+
+        /* Animación del cursor parpadeante */
         .blink { animation: blinker 1s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
+
+        /* Ventana emergente (Monitor GUI) */
         #monitor {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
+            z-index: 100; /* Siempre al frente de todo */
+        }
+
+        /* Ajuste de tamaño para PC */
+        @media screen and (min-width: 1024px) {
+            .terminal { max-width: 1100px; height: 650px; }
         }
     </style>
 </head>
 <body>
+
+    <canvas id="matrix-canvas" style="position: fixed; top: 0; left: 0; z-index: 1;"></canvas>
 
     <div class="terminal" onclick="document.getElementById('user-input').focus();">
         <div class="header">
@@ -54,8 +86,10 @@
             </div>
             <span class="title">nocrutack — bash — 80x24</span>
         </div>
+
         <div class="content">
             <p id="typing-text"></p>
+            
             <div id="input-line" style="display: none;">
                 <span class="prompt">nocrutack@lab:~$</span>
                 <span id="display-text"></span><span class="blink">_</span>
@@ -65,9 +99,16 @@
     </div>
 
     <div id="monitor">
-        <div style="background: white; padding: 20px; border-radius: 10px; width: 80%;">
-            <button onclick="document.getElementById('monitor').style.display='none'">CERRAR</button>
-            <div id="monitor-body"></div>
+        <div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 800px; position: relative;">
+            <nav style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <strong id="monitor-title" style="color: #333;">Explorador de Archivos</strong>
+                <button onclick="document.getElementById('monitor').style.display='none'" 
+                        style="background: #ff5f56; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                    CERRAR
+                </button>
+            </nav>
+            <div id="monitor-body" style="color: #333; font-family: sans-serif;">
+                </div>
         </div>
     </div>
 
