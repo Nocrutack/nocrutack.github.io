@@ -1,6 +1,10 @@
-/* --- RESET Y FONDO FORZADO --- */
+/* --- CONFIGURACIÓN GLOBAL --- */
+* {
+    box-sizing: border-box;
+}
+
 html, body {
-    background-color: #0d0d0d !important;
+    background-color: #0d0d0d; /* Fondo casi negro */
     margin: 0;
     padding: 0;
     width: 100%;
@@ -8,100 +12,144 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow-x: hidden;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+    overflow: hidden;
 }
 
-/* --- TERMINAL --- */
+/* --- VENTANA TERMINAL (ESTILO MAC) --- */
 .terminal {
-    background: #000 !important;
+    background: #000;
     width: 90%;
-    max-width: 750px;
-    height: 450px;
+    max-width: 800px;
+    height: 480px;
+    border-radius: 12px; /* Esquinas redondeadas estilo Apple */
     border: 1px solid #333;
-    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 65, 0.05);
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: hidden;
 }
 
+/* --- HEADER / BARRA SUPERIOR --- */
 .header {
-    background: #333;
-    color: #ddd;
-    padding: 8px 15px;
-    font-size: 13px;
+    background: #2d2d2d; /* Gris de la barra de Mac */
+    height: 38px;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    position: relative;
 }
 
+.buttons {
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Colores oficiales de macOS */
+.red { background: #ff5f56; border: 0.5px solid #e0443e; }
+.yellow { background: #ffbd2e; border: 0.5px solid #dea123; }
+.green { background: #27c93f; border: 0.5px solid #1aab29; }
+
+.title {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    font-weight: 500;
+    pointer-events: none;
+}
+
+/* --- CONTENIDO DE LA TERMINAL --- */
 .content {
     padding: 20px;
-    font-size: 16px;
-    line-height: 1.6;
-    color: #00ff41; /* Verde matriz */
+    font-size: 15px;
+    line-height: 1.5;
+    color: #00ff41; /* Verde Matrix */
     overflow-y: auto;
     flex-grow: 1;
 }
 
-/* --- INPUTS Y TEXTO (CORRECCIÓN MÓVIL) --- */
-.prompt { color: #0087ff; font-weight: bold; }
+/* Personalización del scrollbar */
+.content::-webkit-scrollbar { width: 8px; }
+.content::-webkit-scrollbar-track { background: #000; }
+.content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+/* --- INPUTS Y PROMPT --- */
+.prompt { 
+    color: #0087ff; /* Azul para el usuario */
+    font-weight: bold; 
+    margin-right: 8px;
+}
 
 #input-line {
     display: flex;
     align-items: center;
-    flex-wrap: wrap; /* Para que en móviles no se corte */
+    margin-top: 5px;
 }
 
 #user-input {
     background: transparent !important;
     border: none !important;
-    color: transparent !important;
+    color: transparent !important; /* El input real es invisible */
     outline: none !important;
-    width: 1px;
+    width: 2px;
     position: absolute;
-    /* Quita el cuadro blanco en Android/iOS */
     appearance: none;
     -webkit-appearance: none;
 }
 
 #display-text {
     color: #00ff41;
-    margin-left: 5px;
     white-space: pre-wrap;
     word-break: break-all;
 }
 
-.blink { animation: blinker 1s linear infinite; color: #00ff41; }
+.blink { 
+    animation: blinker 1s linear infinite; 
+    color: #00ff41; 
+    font-weight: bold;
+}
+
 @keyframes blinker { 50% { opacity: 0; } }
 
-/* --- MONITOR (GUI) --- */
+/* --- MONITOR GUI (PANTALLA EMERGENTE) --- */
 #monitor {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: radial-gradient(circle, #222 0%, #000 100%);
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px); /* Efecto cristal */
     z-index: 1000;
     display: none;
     justify-content: center;
     align-items: center;
+    padding: 20px;
 }
 
 .monitor-frame {
-    width: 90%;
+    width: 100%;
     max-width: 900px;
-    height: 80%;
-    background: #444;
-    padding: 15px;
-    border-radius: 20px;
-    border: 4px solid #555;
+    height: 85vh;
+    background: #f0f0f0;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
 }
 
 .monitor-screen {
-    background: #e0e0e0;
-    height: 100%;
-    border-radius: 5px;
-    overflow: hidden;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     color: #333;
@@ -110,26 +158,23 @@ html, body {
 /* --- DISEÑO RESPONSIVO (MÓVIL) --- */
 @media screen and (max-width: 600px) {
     body {
-        background-color: #0d0d0d !important;
-        align-items: flex-start; /* Para que la terminal empiece arriba */
-        padding-top: 20px;
+        align-items: flex-start;
+        padding-top: 10px;
     }
 
     .terminal {
         width: 95% !important;
-        height: 80vh !important; /* Más alto para que quepa el texto */
+        height: 85vh !important;
+        border-radius: 8px;
     }
 
     .content {
-        font-size: 14px !important;
-        padding: 15px !important;
+        font-size: 13px !important;
+        padding: 12px !important;
     }
 
     .monitor-frame {
-        width: 100% !important;
         height: 100% !important;
         border-radius: 0 !important;
     }
-
-    .monitor-base { display: none !important; }
 }
