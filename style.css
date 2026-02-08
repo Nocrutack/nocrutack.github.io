@@ -1,122 +1,148 @@
-const terminalText = ">> NOCRUTACK OS v1.0.4\n>> Cargando módulos de aprendizaje...\n>> Escribe 'ls' para ver mis temas o 'help' para ayuda.";
-const speed = 30;
-let i = 0;
-let isTyping = true; 
+/* --- 1. CONFIGURACIÓN GLOBAL Y CUERPO --- */
+html, body {
+    background-color: #0d0d0d; /* Color de fondo casi negro */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    display: flex; /* Usamos flexbox para centrar la terminal */
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    font-family: 'SF Mono', Monaco, monospace; /* Fuente estilo código */
+    overflow: hidden; /* Evita que aparezcan barras de desplazamiento en el cuerpo */
+}
 
-// Base de datos de temas
-const temas = {
-    "redes": "<h1>📁 Laboratorio de Redes</h1><p>Dominando protocolos TCP/IP y configuración Cisco.</p><img src='https://via.placeholder.com/400x200' style='width:100%; border-radius:10px; margin-top:10px;'>",
-    "linux": "<h1>📁 Sistema Linux</h1><p>Administración de servidores y scripting en Bash.</p>",
-    "seguridad": "<h1>📁 Seguridad Informática</h1><p>Análisis de vulnerabilidades y defensa activa.</p>"
-};
+/* --- 2. CONTENEDOR DE LA TERMINAL --- */
+.terminal {
+    background: #000; /* Fondo negro puro */
+    width: 95%; /* En móviles ocupa casi todo el ancho */
+    max-width: 800px; /* Tamaño máximo estándar */
+    height: 480px; /* Altura estándar */
+    border-radius: 12px; /* Bordes redondeados estilo Mac */
+    border: 1px solid #333; /* Borde gris sutil */
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7); /* Sombra para dar profundidad */
+    display: flex;
+    flex-direction: column; /* Apila el header sobre el contenido */
+    position: relative;
+    overflow: hidden; /* Corta lo que sobresalga de los bordes redondeados */
+    transition: all 0.3s ease; /* Suaviza cambios de tamaño */
+}
 
-const inputField = document.getElementById('user-input');
-const displayText = document.getElementById('display-text');
-const consoleContent = document.getElementById('typing-text');
-const contentDiv = document.querySelector('.content');
+/* --- 3. BARRA SUPERIOR (HEADER ESTILO MAC) --- */
+.header {
+    background: #2d2d2d; /* Gris oscuro del encabezado */
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    position: relative;
+}
 
-// 1. EFECTO DE ESCRITURA
-function typeWriter() {
-    if (i < terminalText.length) {
-        let char = terminalText.charAt(i);
-        consoleContent.innerHTML += (char === "\n") ? "<br>" : char;
-        i++;
-        setTimeout(typeWriter, speed);
-        contentDiv.scrollTop = contentDiv.scrollHeight;
-    } else {
-        finishLoading();
+.buttons {
+    display: flex;
+    gap: 8px; /* Espacio entre los botones rojo, amarillo y verde */
+    z-index: 2;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%; /* Hace los botones circulares */
+}
+
+/* Colores específicos de los botones de macOS */
+.red { background: #ff5f56; border: 0.5px solid #e0443e; }
+.yellow { background: #ffbd2e; border: 0.5px solid #dea123; }
+.green { background: #27c93f; border: 0.5px solid #1aab29; }
+
+.title {
+    position: absolute; /* Centra el título respecto a toda la barra */
+    width: 100%;
+    left: 0;
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    pointer-events: none; /* Evita que el título interfiera con clics */
+}
+
+/* --- 4. ÁREA DE TEXTO Y CONTENIDO --- */
+.content {
+    padding: 20px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #00ff41; /* Verde Matrix */
+    overflow-y: auto; /* Permite scroll si el texto es muy largo */
+    flex-grow: 1; /* Ocupa todo el espacio sobrante de la ventana */
+}
+
+/* Estilo de la barra de scroll para que combine */
+.content::-webkit-scrollbar { width: 6px; }
+.content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+/* --- 5. LÍNEA DE ENTRADA (PROMPT) --- */
+.prompt { 
+    color: #0087ff; /* Azul para el nombre de usuario */
+    font-weight: bold;
+    margin-right: 8px;
+}
+
+#input-line {
+    display: flex;
+    align-items: center;
+}
+
+#user-input {
+    background: transparent;
+    border: none;
+    color: transparent; /* El texto real es invisible para usar el span de abajo */
+    outline: none;
+    width: 1px; /* Casi invisible, pero recibe el foco */
+    position: absolute;
+}
+
+#display-text {
+    color: #00ff41; /* Texto que el usuario ve mientras escribe */
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.blink { 
+    animation: blinker 1s linear infinite; /* Animación del cursor _ */
+}
+
+@keyframes blinker { 50% { opacity: 0; } }
+
+/* --- 6. MONITOR GUI (VENTANA EMERGENTE) --- */
+#monitor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); /* Fondo oscurecido */
+    backdrop-filter: blur(5px); /* Efecto de cristal borroso */
+    z-index: 1000;
+    display: none; /* Se activa con JS */
+    justify-content: center;
+    align-items: center;
+}
+
+.monitor-frame {
+    width: 90%;
+    max-width: 900px;
+    height: 80vh;
+    background: #f0f0f0; /* Fondo claro para contraste */
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* --- 7. RESPONSIVIDAD (TAMAÑO PC) --- */
+@media screen and (min-width: 1024px) {
+    .terminal {
+        max-width: 1100px; /* Ventana más ancha en PC */
+        height: 650px;     /* Ventana más alta en PC */
+    }
+    .content {
+        font-size: 17px; /* Texto un poco más grande para pantallas grandes */
     }
 }
-
-// 2. COMPLETAR CARGA AL DAR ENTER
-function finishLoading() {
-    if (!isTyping) return;
-    isTyping = false;
-    // Detener cualquier timeout pendiente y mostrar todo el texto
-    consoleContent.innerHTML = terminalText.replace(/\n/g, "<br>");
-    document.getElementById('input-line').style.display = "flex";
-    inputField.focus();
-}
-
-// Escuchar Enter global para saltar intro
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && isTyping) {
-        finishLoading();
-    }
-});
-
-// Sincronizar el input invisible con el texto visual
-inputField.addEventListener('input', (e) => {
-    displayText.textContent = e.target.value;
-});
-
-// 3. PROCESADOR DE COMANDOS (ESTRICTO)
-inputField.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !isTyping) {
-        const rawInput = inputField.value.trim();
-        const parts = rawInput.split(' ');
-        const cmd = parts[0].toLowerCase();
-        const arg = parts[1] ? parts[1].toLowerCase() : null;
-
-        // Mostrar el comando en pantalla
-        consoleContent.innerHTML += `<br><span class="prompt">nocrutack@lab:~$</span> ${rawInput}<br>`;
-
-        // VALIDACIÓN LÓGICA
-        if (rawInput === 'ls') {
-            const lista = Object.keys(temas)
-                .map(t => `<span style="color: #5cb3ff; font-weight: bold;">${t}</span>`)
-                .join(' &nbsp;&nbsp; ');
-            consoleContent.innerHTML += lista;
-        } 
-        else if (cmd === 'cd') {
-            // Solo acepta "cd" seguido de un tema válido y NADA MÁS tras el tema
-            if (parts.length === 2 && temas[arg]) {
-                consoleContent.innerHTML += `Accediendo a ${arg}...`;
-                setTimeout(() => { abrirMonitor(arg); }, 500);
-            } else {
-                consoleContent.innerHTML += `<span style="color: #ff5f56;">Error: Directorio no encontrado o comando incompleto.</span>`;
-            }
-        }
-        else if (rawInput === 'clear') {
-            consoleContent.innerHTML = "Terminal limpia. Sistema listo.<br>";
-        }
-        else if (rawInput === 'help') {
-            consoleContent.innerHTML += "Comandos disponibles: <br> - ls (listar temas) <br> - cd [tema] (abrir) <br> - clear (limpiar)";
-        }
-        else if (rawInput !== "") {
-            consoleContent.innerHTML += `<span style="color: #ff5f56;">Comando no reconocido: ${cmd}</span>`;
-        }
-
-        // Limpiar input
-        inputField.value = "";
-        displayText.textContent = "";
-        
-        // Auto-scroll
-        setTimeout(() => {
-            contentDiv.scrollTop = contentDiv.scrollHeight;
-        }, 10);
-    }
-});
-
-// 4. FUNCIONES DEL MONITOR
-function abrirMonitor(tema) {
-    const monitor = document.getElementById('monitor');
-    const monitorBody = document.getElementById('monitor-body');
-    const monitorTitle = document.getElementById('monitor-title');
-
-    monitorTitle.innerText = `Explorador: /home/nocrutack/${tema}`;
-    monitorBody.innerHTML = temas[tema];
-    monitor.style.display = "flex";
-}
-
-function closeMonitor() {
-    document.getElementById('monitor').style.display = "none";
-    inputField.focus();
-}
-
-// Iniciar proceso
-window.onload = () => {
-    typeWriter();
-    // Limitar caracteres físicamente
-    inputField.setAttribute("maxlength", "15");
-};
