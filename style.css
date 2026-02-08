@@ -8,6 +8,7 @@
     --text-prompt: #0087ff;    /* Azul para el usuario@lab */
     --matrix-opacity: 1;       /* Visibilidad total del fondo animado */
     --shadow-color: rgba(0,0,0,0.7);
+    --border-terminal: #333;   /* Borde sutil para modo oscuro */
 }
 
 /* --- VARIABLES PARA MODO CLARO --- */
@@ -20,6 +21,7 @@
     --text-prompt: #005bb7;    /* Azul más oscuro para contraste en blanco */
     --matrix-opacity: 0.15;    /* Matrix casi invisible para no molestar */
     --shadow-color: rgba(0,0,0,0.1);
+    --border-terminal: #bcbcbc; /* Borde más definido para que la terminal resalte en blanco */
 }
 
 /* --- 1. CONFIGURACIÓN GLOBAL Y CUERPO --- */
@@ -53,7 +55,7 @@ html, body {
     max-width: 800px; 
     height: 480px; 
     border-radius: 12px; 
-    border: 1px solid #333; 
+    border: 1px solid var(--border-terminal); /* BORDE DINÁMICO AÑADIDO */
     box-shadow: 0 20px 50px var(--shadow-color); 
     display: flex;
     flex-direction: column; 
@@ -74,7 +76,7 @@ html, body {
     transition: background-color 0.3s ease;
 }
 
-/* Botón de cambio de tema (añadido al CSS) */
+/* Botón de cambio de tema */
 #theme-toggle {
     position: absolute;
     right: 15px;
