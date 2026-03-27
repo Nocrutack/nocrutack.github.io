@@ -1,36 +1,72 @@
-<div class="content">
-    <div class="newsletter-header">
-        <pre>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Nocrutack | Cybersecurity Newsletter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="terminal">
+        
+        <div class="header">
+            <div class="buttons">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+            </div>
+            <span class="title">nocrutack — bash — 80x24</span>
+            <button id="theme-toggle">MODO CLARO</button>
+        </div>
+
+        <div class="content">
+            
+            <p id="typing-text"></p>
+            
+            <div id="newsletter-content" style="display: none;">
+                
+                <div class="newsletter-header">
+                    <pre class="ascii-art">
  _  _  ___   ___  ____  _  _  ____  __    ___  __ _ 
 ( \( )/ _ \ / __)(  _ \( )/ )(  _ \(  )  / __)(  / )
  )  (( (_) )( (__  )   / )  (  )   / )(__( (__  )  ( 
 (_)\_)\___/ \___)(_)\_)(_)\_)(_)\_)(____)\___)(_)\_)
-        </pre>
-        <p class="system-msg">System: Initializing Newsletter Protocol v2.6...</p>
-        <hr class="separator">
+                    </pre>
+                    <p class="system-msg">System: Initializing Newsletter Protocol v2.6... [OK]</p>
+                    <hr class="separator">
+                </div>
+
+                <div id="news-feed">
+                    <article class="post">
+                        <span class="timestamp">[2026-03-26]</span> 
+                        <span class="tag vuln">[VULN]</span> 
+                        <h2 class="post-title">Nueva vulnerabilidad Zero-Day en Kernel Linux</h2>
+                        <p class="summary">Se ha detectado una ejecución remota de código que afecta a versiones 6.x. Los investigadores recomiendan parchear inmediatamente los servidores expuestos.</p>
+                        <a href="#" class="read-more">>> LEER_MAS</a>
+                    </article>
+
+                    <article class="post">
+                        <span class="timestamp">[2026-03-24]</span> 
+                        <span class="tag info">[INFO]</span> 
+                        <h2 class="post-title">Guía de anonimato en redes públicas</h2>
+                        <p class="summary">Cómo configurar una cadena de proxies y VPN para auditorías externas sin revelar tu dirección IP real durante las pruebas de penetración.</p>
+                        <a href="#" class="read-more">>> LEER_MAS</a>
+                    </article>
+                </div>
+            </div>
+            
+            <div id="input-line" style="display: none;">
+                <span class="prompt">nocrutack@news:~$</span>
+                <span id="display-text"></span><span class="blink">_</span>
+                <input type="text" id="user-input" autofocus autocomplete="off">
+            </div>
+
+        </div>
     </div>
 
-    <div id="news-feed">
-        <article class="post">
-            <span class="timestamp">[2026-03-26]</span> 
-            <span class="tag vuln">[VULN]</span> 
-            <h2 class="post-title">Nueva vulnerabilidad Zero-Day en Kernel Linux</h2>
-            <p class="summary">Se ha detectado una ejecución remota de código que afecta a versiones 6.x. Los investigadores recomiendan parchear inmediatamente...</p>
-            <a href="#" class="read-more">>> LEER_MAS</a>
-        </article>
-
-        <article class="post">
-            <span class="timestamp">[2026-03-24]</span> 
-            <span class="tag info">[INFO]</span> 
-            <h2 class="post-title">Guía de anonimato en redes públicas</h2>
-            <p class="summary">Cómo configurar una cadena de proxies y VPN para auditorías externas sin revelar tu IP real...</p>
-            <a href="#" class="read-more">>> LEER_MAS</a>
-        </article>
-    </div>
-    
-    <div id="input-line">
-        <span class="prompt">nocrutack@news:~$</span>
-        <span id="display-text"></span><span class="blink">_</span>
-        <input type="text" id="user-input" autofocus autocomplete="off">
-    </div>
-</div>
+    <script src="script.js"></script>
+</body>
+</html>
