@@ -1,212 +1,36 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Nocrutack | Cybersecurity Lab</title>
-    
-    <link rel="icon" type="image/png" href="OD.png">
-    
-    <style>
-        /* --- VARIABLES DE COLOR (DISEÑO ADAPTATIVO) --- */
-        :root {
-            --bg-color: #0d0d0d;      /* Fondo de la página */
-            --terminal-bg: #000;      /* Fondo de la terminal */
-            --text-color: #00ff41;    /* Verde Matrix */
-            --header-bg: #2d2d2d;     /* Barra superior gris */
-            --prompt-color: #0087ff;  /* Azul usuario */
-            --canvas-opacity: 1;      
-            --border-terminal: #333;  /* Borde oscuro */
-            --shadow: rgba(0,0,0,0.8);
-        }
-
-        [data-theme="light"] {
-            --bg-color: #e5e5e5;      
-            --terminal-bg: #ffffff;   
-            --text-color: #1d1d1f;    
-            --header-bg: #d1d1d6;     
-            --prompt-color: #005bb7;  
-            --canvas-opacity: 0.15;   
-            --border-terminal: #bcbcbc; /* Borde gris para que la terminal blanca resalte */
-            --shadow: rgba(0,0,0,0.1);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background-color: var(--bg-color); 
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'SF Mono', 'Monaco', monospace;
-            overflow: hidden;
-            transition: background-color 0.3s ease; 
-        }
-
-        #matrix-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            z-index: 1;
-            opacity: var(--canvas-opacity);
-            transition: opacity 0.3s ease;
-        }
-
-        .terminal {
-            background: var(--terminal-bg);
-            width: 90%;
-            max-width: 800px; 
-            height: 480px;
-            border-radius: 12px;
-            border: 1px solid var(--border-terminal); /* BORDE DINÁMICO */
-            box-shadow: 0 20px 50px var(--shadow);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            overflow: hidden;
-            z-index: 10;
-            transition: all 0.3s ease;
-        }
-
-        @media screen and (min-width: 1024px) {
-            .terminal { max-width: 1100px; height: 650px; }
-        }
-
-        .header {
-            background: var(--header-bg);
-            height: 38px;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            position: relative;
-            flex-shrink: 0;
-            transition: background-color 0.3s ease;
-        }
-
-        .buttons { display: flex; gap: 8px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
-        .red { background: #ff5f56; border: 0.5px solid #e0443e; }
-        .yellow { background: #ffbd2e; border: 0.5px solid #dea123; }
-        .green { background: #27c93f; border: 0.5px solid #1aab29; }
-
-        .title {
-            position: absolute;
-            width: 100%;
-            text-align: center;
-            color: #999;
-            font-size: 13px;
-            left: 0;
-            pointer-events: none;
-        }
-
-        #theme-toggle {
-            position: absolute;
-            right: 15px;
-            background: #444;
-            color: white;
-            border: none;
-            padding: 3px 10px;
-            border-radius: 5px;
-            font-size: 10px;
-            cursor: pointer;
-            z-index: 20;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        
-        #theme-toggle:hover { background: #666; }
-
-        .content {
-            padding: 20px;
-            font-size: 16px;
-            color: var(--text-color);
-            overflow-y: auto;
-            flex-grow: 1;
-            line-height: 1.4;
-            transition: color 0.3s ease;
-        }
-
-        .prompt { color: var(--prompt-color); font-weight: bold; margin-right: 8px; }
-        
-        #input-line { display: flex; align-items: center; }
-
-        #user-input {
-            background: transparent;
-            border: none;
-            color: transparent;
-            outline: none;
-            width: 1px;
-            position: absolute;
-        }
-
-        #display-text { color: var(--text-color); white-space: pre-wrap; }
-
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
-    </style>
-</head>
-<body>
-
-    <canvas id="matrix-canvas"></canvas>
-
-    <div class="terminal" onclick="document.getElementById('user-input').focus();">
-        
-        <div class="header">
-            <div class="buttons">
-                <span class="dot red"></span>
-                <span class="dot yellow"></span>
-                <span class="dot green"></span>
-            </div>
-            <span class="title">nocrutack — bash — 80x24</span>
-            
-            <button id="theme-toggle">MODO CLARO</button>
-        </div>
-
-        <div class="content">
-            <p id="typing-text"></p>
-            
-            <div id="input-line" style="display: none;">
-                <span class="prompt">nocrutack@lab:~$</span>
-                <span id="display-text"></span><span class="blink">_</span>
-                <input type="text" id="user-input" autofocus autocomplete="off" maxlength="15">
-            </div>
-        </div>
+<div class="content">
+    <div class="newsletter-header">
+        <pre>
+ _  _  ___   ___  ____  _  _  ____  __    ___  __ _ 
+( \( )/ _ \ / __)(  _ \( )/ )(  _ \(  )  / __)(  / )
+ )  (( (_) )( (__  )   / )  (  )   / )(__( (__  )  ( 
+(_)\_)\___/ \___)(_)\_)(_)\_)(_)\_)(____)\___)(_)\_)
+        </pre>
+        <p class="system-msg">System: Initializing Newsletter Protocol v2.6...</p>
+        <hr class="separator">
     </div>
 
-    <script src="script.js"></script>
+    <div id="news-feed">
+        <article class="post">
+            <span class="timestamp">[2026-03-26]</span> 
+            <span class="tag vuln">[VULN]</span> 
+            <h2 class="post-title">Nueva vulnerabilidad Zero-Day en Kernel Linux</h2>
+            <p class="summary">Se ha detectado una ejecución remota de código que afecta a versiones 6.x. Los investigadores recomiendan parchear inmediatamente...</p>
+            <a href="#" class="read-more">>> LEER_MAS</a>
+        </article>
+
+        <article class="post">
+            <span class="timestamp">[2026-03-24]</span> 
+            <span class="tag info">[INFO]</span> 
+            <h2 class="post-title">Guía de anonimato en redes públicas</h2>
+            <p class="summary">Cómo configurar una cadena de proxies y VPN para auditorías externas sin revelar tu IP real...</p>
+            <a href="#" class="read-more">>> LEER_MAS</a>
+        </article>
+    </div>
     
-    <script>
-        // LÓGICA DE PERSISTENCIA DEL TEMA
-        const btn = document.getElementById('theme-toggle');
-
-        // Función para aplicar tema y actualizar interfaz
-        function applyTheme(theme) {
-            if (theme === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-                btn.innerText = 'MODO OSCURO';
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-                btn.innerText = 'MODO CLARO';
-            }
-        }
-
-        // 1. Al cargar: leer memoria
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) applyTheme(savedTheme);
-
-        // 2. Al hacer clic: cambiar, guardar y mantener foco
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Evita que el clic dispare el focus del terminal prematuramente
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-            const nextTheme = isLight ? 'dark' : 'light';
-            
-            applyTheme(nextTheme);
-            localStorage.setItem('theme', nextTheme);
-            
-            // Refocalizar el input después de cambiar tema
-            document.getElementById('user-input').focus();
-        });
-    </script>
-</body>
-</html>
+    <div id="input-line">
+        <span class="prompt">nocrutack@news:~$</span>
+        <span id="display-text"></span><span class="blink">_</span>
+        <input type="text" id="user-input" autofocus autocomplete="off">
+    </div>
+</div>
