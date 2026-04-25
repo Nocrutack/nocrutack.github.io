@@ -1,68 +1,130 @@
-:root {
-    --bg-terminal: rgba(13, 13, 13, 0.95);
-    --text-color: #27c93f; /* Verde clásico */
-    --prompt-color: #4599ff;
-    --border-color: #333;
+/* --- CONFIGURACIÓN --- */
+const terminalText = ">> NOCRUTACK OS v1.0.4\n>> Cargando módulos...\n>> Sistema listo.";
+const speed = 40;
+let i = 0;
+let isTyping = true;
+
+const consoleContent = document.getElementById('typing-text');
+const newsletterWrapper = document.getElementById('newsletter-wrapper');
+const terminalLog = document.getElementById('terminal-log');
+const inputLine = document.getElementById('input-line');
+const inputField = document.getElementById('user-input');
+const displayText = document.getElementById('display-text');
+const contentDiv = document.getElementById('terminal-content');
+const themeToggle = document.getElementById('theme-toggle');
+
+/* --- MOTOR DE ESCRITURA --- */
+function typeWriter() {
+    if (i < terminalText.length) {
+        let char = terminalText.charAt(i);
+        consoleContent.innerHTML += (char === "\n") ? "<br>" : char;
+        i++;
+        setTimeout(typeWriter, speed);
+        contentDiv.scrollTop = contentDiv.scrollHeight;
+    } else {
+        setTimeout(finishLoading, 600);
+    }
 }
 
-[data-theme="light"] {
-    --bg-terminal: rgba(245, 245, 247, 0.95);
-    --text-color: #1d1d1f;
-    --prompt-color: #0066cc;
-    --border-color: #d2d2d7;
+function finishLoading() {
+    if (!isTyping) return;
+    isTyping = false;
+    consoleContent.style.display = "none";
+    newsletterWrapper.style.display = "block";
+    inputLine.style.display = "flex";
+    inputField.focus();
 }
 
-body, html {
-    margin: 0; padding: 0;
-    height: 100%; overflow: hidden;
-    background-color: #000;
-    font-family: 'Courier New', Courier, monospace;
+/* --- COMANDOS --- */
+function processCommand(rawInput) {
+    const cmd = rawInput.toLowerCase().trim();
+    const logEntry = document.createElement('div');
+    logEntry.style.margin = "10px 0";
+
+    // Eco del comando
+    const echo = document.createElement('div');
+    echo.innerHTML = `<span class="prompt">nocrutack@news:~$</span> ${rawInput}`;
+    terminalLog.appendChild(echo);
+
+    if (cmd === 'clear') {
+        terminalLog.innerHTML = ""; // Ahora sí limpia TODO el historial
+        return;
+    } 
+    
+    switch(cmd) {
+        case 'help':
+            logEntry.innerHTML = "Comandos disponibles: <span style='color: #ffbd2e;'>clear, update, whoami, help</span>";
+            break;
+        case 'update':
+            logEntry.innerHTML = "Conectando... [No hay nuevas publicaciones]";
+            break;
+        case 'whoami':
+            logEntry.innerHTML = "Usuario: guest@nocrutack_lab";
+            break;
+        case '':
+            break;
+        default:
+            logEntry.innerHTML = `<span style='color: #ff5f56;'>sh: comando no encontrado: ${cmd}</span>`;
+    }
+
+    terminalLog.appendChild(logEntry);
+    contentDiv.scrollTop = contentDiv.scrollHeight;
 }
 
-#matrix-canvas {
-    position: fixed; top: 0; left: 0; z-index: -1;
+/* --- EVENTOS --- */
+inputField.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        processCommand(inputField.value);
+        inputField.value = "";
+        displayText.textContent = "";
+    }
+});
+
+// Saltar intro
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && isTyping) finishLoading();
+});
+
+inputField.addEventListener('input', (e) => displayText.textContent = e.target.value);
+document.addEventListener('click', () => !isTyping && inputField.focus());
+
+/* --- TEMA --- */
+themeToggle.addEventListener('click', () => {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    const nextTheme = isLight ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    themeToggle.innerText = isLight ? 'MODO CLARO' : 'MODO OSCURO';
+    localStorage.setItem('theme', nextTheme);
+});
+
+/* --- MATRIX --- */
+const canvas = document.getElementById('matrix-canvas');
+const ctx = canvas.getContext('2d');
+let columns, drops;
+
+function initMatrix() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    columns = Math.floor(canvas.width / 16);
+    drops = Array(columns).fill(1);
 }
 
-.terminal {
-    width: 90%; max-width: 900px;
-    height: 80vh; margin: 5vh auto;
-    background: var(--bg-terminal);
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    display: flex; flex-direction: column;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#003300";
+    ctx.font = "16px monospace";
+    for (let i = 0; i < drops.length; i++) {
+        const text = Math.floor(Math.random() * 2);
+        ctx.fillText(text, i * 16, drops[i] * 16);
+        if (drops[i] * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
 }
 
-.header {
-    background: #222; padding: 10px;
-    display: flex; align-items: center;
-    border-top-left-radius: 10px; border-top-right-radius: 10px;
-}
+window.addEventListener('resize', initMatrix);
+initMatrix();
+setInterval(drawMatrix, 50);
 
-.buttons { display: flex; gap: 8px; margin-right: 15px; }
-.dot { width: 12px; height: 12px; border-radius: 50%; }
-.red { background: #ff5f56; } .yellow { background: #ffbd2e; } .green { background: #27c93f; }
-
-.title { color: #bbb; font-size: 12px; flex-grow: 1; text-align: center; }
-
-#theme-toggle {
-    background: #444; color: #fff; border: none;
-    padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;
-}
-
-.content {
-    padding: 20px; overflow-y: auto; color: var(--text-color); flex-grow: 1;
-}
-
-.ascii-art { font-size: 8px; line-height: 1; margin-bottom: 20px; white-space: pre-wrap; }
-.post { margin-bottom: 25px; border-left: 2px solid var(--text-color); padding-left: 15px; }
-.post-title { font-size: 18px; margin: 5px 0; }
-.read-more { color: var(--prompt-color); text-decoration: none; font-weight: bold; }
-
-#input-line { display: flex; align-items: center; gap: 10px; }
-.prompt { color: var(--prompt-color); font-weight: bold; }
-#user-input {
-    position: absolute; opacity: 0; pointer-events: none;
-}
-.blink { animation: blinker 1s linear infinite; }
-@keyframes blinker { 50% { opacity: 0; } }
+// Iniciar
+window.onload = typeWriter;
