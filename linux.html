@@ -3,180 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nocrutack | Linux System</title>
+    <title>Nocrutack | Linux System Lab</title>
     <link rel="icon" type="image/png" href="OD.png">
     
     <style>
-        /* --- 0. VARIABLES DE TEMA ADAPTATIVAS (MODO OSCURO POR DEFECTO) --- */
+        /* --- VARIABLES DE TEMA (SINCRONIZADAS CON INDEX) --- */
         :root {
-            --bg-page: #0d0d0d;         /* Fondo general oscuro */
-            --bg-card: #1a1a1a;         /* Fondo de la tarjeta */
-            --bg-nav: rgba(20, 20, 20, 0.8); /* Barra de navegación traslúcida */
-            --text-title: #ffffff;      /* Títulos en blanco */
-            --text-body: #d2d2d7;       /* Texto gris claro estilo Apple */
-            --text-muted: #86868b;      /* Texto secundario/desactivado */
-            --border-color: #333336;    /* Bordes sutiles */
-            --badge-bg: #333336;        /* Fondo de etiquetas */
-            --btn-bg: #444;             /* Botón modo oscuro */
-            --btn-text: #fff;           /* Texto del botón */
+            --bg-page: #0d0d0d;
+            --bg-card: #1a1a1a;
+            --bg-nav: rgba(20, 20, 20, 0.8);
+            --text-title: #ffffff;
+            --text-body: #d2d2d7;
+            --text-muted: #86868b;
+            --border-color: #333336;
+            --badge-bg: #333336;
+            --btn-bg: #444;
+            --btn-text: #fff;
+            --accent: #0066cc;
         }
 
-        /* --- VARIABLES PARA MODO CLARO --- */
-        /* Estas variables se activan cuando el atributo 'data-theme' es 'light' */
         [data-theme="light"] {
-            --bg-page: #f5f5f7;         /* Gris muy claro de fondo */
-            --bg-card: #ffffff;         /* Tarjeta blanca pura */
+            --bg-page: #f5f5f7;
+            --bg-card: #ffffff;
             --bg-nav: rgba(255, 255, 255, 0.8);
-            --text-title: #1d1d1f;      /* Texto negro profundo */
-            --text-body: #424245;       /* Gris oscuro para cuerpo */
+            --text-title: #1d1d1f;
+            --text-body: #424245;
             --text-muted: #86868b;
-            --border-color: #d2d2d7;    /* Bordes grises claros */
+            --border-color: #d2d2d7;
             --badge-bg: #e8e8ed;
-            --btn-bg: #d1d1d6;          /* Botón gris plata */
+            --btn-bg: #d1d1d6;
             --btn-text: #1d1d1f;
         }
 
-        /* --- 1. ESTILOS BASE --- */
         body {
             background-color: var(--bg-page);
             color: var(--text-body);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            transition: background-color 0.3s ease, color 0.3s ease; /* Transición suave de colores */
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
-        /* --- 2. NAVEGACIÓN (NAV) --- */
+        /* --- NAVEGACIÓN --- */
         nav {
             width: 100%;
-            height: 50px;
+            height: 52px;
             background: var(--bg-nav);
-            backdrop-filter: blur(20px); /* Efecto de desenfoque de cristal */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
-            position: fixed; /* Mantiene la barra siempre arriba */
+            position: fixed;
             top: 0;
             box-sizing: border-box;
             border-bottom: 0.5px solid var(--border-color);
             z-index: 100;
         }
 
-        /* Contenedor derecho para agrupar botón y link */
         .nav-controls {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        /* Estilo del botón de interruptor de tema */
         #theme-toggle {
             background: var(--btn-bg);
             color: var(--btn-text);
             border: none;
-            padding: 5px 12px;
-            border-radius: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
             font-size: 11px;
             cursor: pointer;
             font-weight: 600;
             transition: all 0.2s ease;
         }
 
-        #theme-toggle:hover { opacity: 0.8; }
-
         .back-link {
             text-decoration: none;
-            color: #0066cc;
+            color: var(--accent);
             font-size: 14px;
-            font-weight: 400;
+            font-weight: 500;
         }
 
-        .back-link:hover { text-decoration: underline; }
-
-        /* --- 3. CONTENEDOR Y TARJETAS --- */
+        /* --- CONTENIDO --- */
         .container {
-            margin-top: 100px; /* Espacio para no quedar debajo del nav */
+            margin-top: 100px;
             width: 90%;
-            max-width: 800px;
-            animation: fadeIn 0.8s ease; /* Animación de entrada al cargar */
+            max-width: 750px;
+            padding-bottom: 50px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .badge {
+            background: var(--badge-bg);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-title);
         }
 
         h1 { 
-            font-size: 48px; 
+            font-size: clamp(32px, 8vw, 48px);
             font-weight: 700; 
-            letter-spacing: -0.5px; 
+            letter-spacing: -1px; 
             color: var(--text-title);
-            margin-top: 10px;
+            margin: 15px 0 30px 0;
         }
         
         .card {
             background: var(--bg-card);
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             line-height: 1.6;
             font-size: 18px;
             border: 1px solid var(--border-color);
-            transition: background-color 0.3s ease;
         }
 
-        .badge {
-            background: var(--badge-bg);
-            padding: 5px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: var(--text-title);
-        }
+        ul { padding-left: 20px; }
+        ul li { margin-bottom: 15px; }
 
-        ul li { margin-bottom: 10px; }
+        .footer-quote {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-top: 40px;
+            font-style: italic;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
     </style>
 </head>
 <body>
 
     <nav>
-        <span style="font-weight: 600; color: var(--text-title);">Nocrutack Lab</span>
+        <span style="font-weight: 700; color: var(--text-title); letter-spacing: -0.5px;">NOCRUTACK LAB</span>
         <div class="nav-controls">
             <button id="theme-toggle">MODO CLARO</button>
-            <a href="index.html" class="back-link">← Volver a Terminal</a>
+            <a href="index.html" class="back-link">← Terminal</a>
         </div>
     </nav>
 
     <div class="container">
-        <span class="badge">Módulo 02</span>
+        <span class="badge">MÓDULO 02</span>
         <h1>Sistema Linux</h1>
         
         <div class="card">
-            <p>Bienvenido al laboratorio de Linux. En esta sección exploraremos:</p>
+            <p>Bienvenido al laboratorio avanzado. Aquí profundizaremos en la arquitectura del kernel y la seguridad de sistemas abiertos.</p>
             <ul>
-                <li>Administración de procesos y memoria.</li>
-                <li>Automatización mediante Scripts en Bash.</li>
-                <li>Hardening de servidores y permisos avanzados.</li>
+                <li><strong>Procesos:</strong> Gestión de señales y estados zombies.</li>
+                <li><strong>Bash Scripting:</strong> Automatización de auditorías de red.</li>
+                <li><strong>Hardening:</strong> Configuración de políticas SELinux y AppArmor.</li>
             </ul>
-            <p style="color: var(--text-muted); font-size: 14px; margin-top: 40px; font-style: italic;">
+            
+            <p class="footer-quote">
                 "El conocimiento es la única herramienta que se multiplica cuando se comparte."
             </p>
         </div>
     </div>
 
     <script>
-        // Seleccionamos el botón por su ID
         const btn = document.getElementById('theme-toggle');
 
-        /**
-         * Función para aplicar el tema visualmente y actualizar el texto del botón
-         * @param {string} theme - Puede ser 'light' o null/oscuro
-         */
         function applyTheme(theme) {
             if (theme === 'light') {
                 document.documentElement.setAttribute('data-theme', 'light');
@@ -187,28 +179,19 @@
             }
         }
 
-        /**
-         * IIFE (Función ejecutada inmediatamente) para cargar el tema al abrir la página
-         */
-        (function() {
-            const savedTheme = localStorage.getItem('theme'); // Recupera la elección de la terminal
-            if (savedTheme) {
-                applyTheme(savedTheme);
-            }
-        })();
+        // Carga inicial del tema guardado
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) applyTheme(savedTheme);
 
-        // Evento que escucha el clic en el botón para alternar el tema
+        // Switch de tema
         if (btn) {
             btn.addEventListener('click', () => {
-                // Comprobamos si actualmente estamos en modo claro
                 const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-                const nextTheme = isLight ? 'dark' : 'light'; // Elegimos el siguiente estado
-                
-                applyTheme(nextTheme); // Aplicamos visualmente
-                localStorage.setItem('theme', nextTheme); // Guardamos para que index.html lo sepa
+                const nextTheme = isLight ? 'dark' : 'light';
+                applyTheme(nextTheme);
+                localStorage.setItem('theme', nextTheme);
             });
         }
     </script>
-
 </body>
 </html>
